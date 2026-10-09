@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { FaWhatsapp } from "react-icons/fa";
 import { RiChatVoiceAiLine } from "react-icons/ri";
 import {
-  FiMessageSquare,
   FiX,
   FiSend,
   FiZap,
@@ -10,19 +9,22 @@ import {
   FiMapPin,
   FiTruck,
   FiTag,
+  FiLock,
+  FiLogIn,
 } from "react-icons/fi";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { useAuth } from "@clerk/clerk-react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   initChat,
   pushUserMessage,
   sendChatMessage,
+  resetChat,
 } from "../../store/slices/chatSlice";
+import { openAuthModal } from "../../utils/authEvents";
 
-/* ============================================================
-   QUICK SUGGESTIONS — shown on fresh chat
-   ============================================================ */
+
 const SUGGESTIONS = [
   { label: "Show me all bikes", icon: <FiTruck size={11} /> },
   { label: "Price range?", icon: <FiTag size={11} /> },
@@ -30,9 +32,7 @@ const SUGGESTIONS = [
   { label: "Factory location", icon: <FiMapPin size={11} /> },
 ];
 
-/* ============================================================
-   MARKDOWN RENDERERS — beautifully styled AI responses
-   ============================================================ */
+
 const markdownComponents = {
   h1: ({ children }) => (
     <h1 className="text-[13px] font-bold text-gray-900 mt-1 mb-1 leading-snug">
@@ -129,9 +129,7 @@ const markdownComponents = {
   ),
 };
 
-/* ============================================================
-   MAIN COMPONENT
-   ============================================================ */
+
 export default function FloatingButtons({ user }) {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
@@ -140,26 +138,44 @@ export default function FloatingButtons({ user }) {
 
   const dispatch = useAppDispatch();
   const { messages, loading, sessionId } = useAppSelector((s) => s.chat);
+  const { isLoaded, isSignedIn } = useAuth();
 
-  /* ============ INIT WELCOME ============ */
+  
+  const isLoggedIn = isLoaded && isSignedIn && !!user;
+
+ 
   useEffect(() => {
-    dispatch(initChat(user?.name));
-  }, [dispatch, user?.name]);
+    if (isLoggedIn && user?.name) {
+      dispatch(initChat(user.name));
+    }
+  }, [dispatch, user?.name, isLoggedIn]);
 
-  /* ============ AUTO-SCROLL ============ */
+  
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      dispatch(resetChat());
+    }
+  }, [isLoaded, isSignedIn, dispatch]);
+
+ 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  /* ============ FOCUS ON OPEN ============ */
+  
   useEffect(() => {
-    if (open) {
+    if (open && isLoggedIn) {
       setTimeout(() => inputRef.current?.focus(), 200);
     }
-  }, [open]);
+  }, [open, isLoggedIn]);
 
-  /* ============ SEND ============ */
   const handleSend = (textOverride) => {
+    if (!isLoggedIn) {
+      setOpen(false);
+      openAuthModal("signin");
+      return;
+    }
+
     const text = (textOverride ?? input).trim();
     if (!text || loading) return;
 
@@ -168,13 +184,12 @@ export default function FloatingButtons({ user }) {
     dispatch(sendChatMessage({ message: text, sessionId }));
   };
 
-  const showSuggestions = messages.length <= 1 && !loading;
+  const showSuggestions = isLoggedIn && messages.length <= 1 && !loading;
 
+  
   return (
     <div className="fixed bottom-4 right-3 sm:bottom-6 sm:right-6 z-[45] flex flex-col items-end gap-2.5">
-      {/* ================================================================
-          CHAT PANEL
-          ================================================================ */}
+     
       {open && (
         <div
           className="
@@ -188,19 +203,17 @@ export default function FloatingButtons({ user }) {
             origin-bottom-right
           "
         >
-          {/* ==================== HEADER ==================== */}
+         
           <div className="relative bg-gradient-to-br from-black via-[#0a0a0a] to-[#1a1a1a] text-white px-3 py-2.5 shrink-0 overflow-hidden">
             <div className="absolute -top-14 -right-14 w-32 h-32 rounded-full bg-green-500/15 blur-3xl pointer-events-none" />
 
             <div className="relative flex items-center gap-2.5">
-              {/* Avatar */}
               <div className="shrink-0">
                 <div className="w-7 h-7 rounded-full bg-white/10 backdrop-blur flex items-center justify-center ring-1 ring-white/15">
                   <RiChatVoiceAiLine className="text-white" size={14} />
                 </div>
               </div>
 
-              {/* Title */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
                   <h3 className="text-[12px] font-semibold tracking-tight truncate">
@@ -211,11 +224,10 @@ export default function FloatingButtons({ user }) {
                   </span>
                 </div>
                 <p className="text-[9.5px] text-white/55 mt-px">
-                  Online · Replies instantly
+                  {isLoggedIn ? "Online · Replies instantly" : "Sign in to chat"}
                 </p>
               </div>
 
-              {/* Close */}
               <button
                 onClick={() => setOpen(false)}
                 aria-label="Close chat"
@@ -234,184 +246,269 @@ export default function FloatingButtons({ user }) {
             </div>
           </div>
 
-          {/* ==================== MESSAGES ==================== */}
-          <div
-            className="
-              flex-1 overflow-y-auto px-2.5 py-2.5 space-y-2
-              chat-scroll
-            "
-            style={{
-              background:
-                "radial-gradient(circle at top left, #fafafa 0%, #f4f4f5 100%)",
-            }}
-          >
-            {messages.map((m, i) => {
-              const isUser = m.role === "user";
-              return (
-                <div
-                  key={i}
-                  className={`flex items-end gap-1.5 animate-[msgIn_0.3s_cubic-bezier(.16,1,.3,1)] ${
-                    isUser ? "justify-end" : "justify-start"
-                  }`}
-                  style={{ animationDelay: `${Math.min(i * 25, 120)}ms` }}
-                >
-                  {/* Bot avatar */}
-                  {!isUser && (
-                    <div className="shrink-0 rounded-full bg-gradient-to-br from-black to-gray-700 flex items-center justify-center ring-1 ring-black/5 mb-0.5 w-5 h-5">
-                      <RiChatVoiceAiLine className="text-white" size={10} />
-                    </div>
-                  )}
-
-                  <div
-                    className={`
-                      max-w-[82%] px-2.5 py-1.5 rounded-2xl
-                      text-[12px] leading-[1.5]
-                      ${
-                        isUser
-                          ? "bg-gradient-to-br from-black to-[#1f1f1f] text-white rounded-br-md shadow-[0_4px_12px_-4px_rgba(0,0,0,0.4)] whitespace-pre-wrap"
-                          : "bg-white text-gray-800 border border-gray-100/80 rounded-bl-md shadow-[0_2px_8px_-2px_rgba(0,0,0,0.06)]"
-                      }
-                    `}
-                  >
-                    {isUser ? (
-                      m.content
-                    ) : (
-                      <div className="break-words">
-                        <ReactMarkdown
-                          remarkPlugins={[remarkGfm]}
-                          components={markdownComponents}
-                        >
-                          {m.content}
-                        </ReactMarkdown>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-
-            {/* ==================== SUGGESTIONS ==================== */}
-            {showSuggestions && (
-              <div className="pt-1 animate-[msgIn_0.5s_cubic-bezier(.16,1,.3,1)]">
-                <p className="text-[9px] font-bold uppercase tracking-wider text-gray-400 px-1 mb-1.5">
-                  Try asking
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {SUGGESTIONS.map((s, i) => (
-                    <button
-                      key={i}
-                      onClick={() => handleSend(s.label)}
-                      className="
-                        group inline-flex items-center gap-1
-                        px-2 py-1 rounded-full
-                        bg-white border border-gray-200/80
-                        text-[10px] font-medium text-gray-700
-                        hover:border-black hover:bg-black hover:text-white
-                        active:scale-95
-                        transition-all duration-300
-                        shadow-sm hover:shadow-[0_4px_12px_-2px_rgba(0,0,0,0.2)]
-                      "
-                    >
-                      <span className="shrink-0">{s.icon}</span>
-                      {s.label}
-                      <FiArrowUpRight
-                        size={8}
-                        className="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300"
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* ==================== TYPING ==================== */}
-            {loading && (
-              <div className="flex items-end gap-1.5 animate-[msgIn_0.3s_ease]">
-                <div className="shrink-0 w-5 h-5 rounded-full bg-gradient-to-br from-black to-gray-700 flex items-center justify-center ring-1 ring-black/5 mb-0.5">
-                  <RiChatVoiceAiLine className="text-white" size={10} />
-                </div>
-                <div className="bg-white border border-gray-100/80 px-3 py-2 rounded-2xl rounded-bl-md shadow-[0_2px_8px_-2px_rgba(0,0,0,0.06)]">
-                  <div className="flex gap-1 items-center h-2">
-                    <span
-                      className="w-1 h-1 rounded-full bg-gray-400 animate-typing"
-                      style={{ animationDelay: "0ms" }}
-                    />
-                    <span
-                      className="w-1 h-1 rounded-full bg-gray-400 animate-typing"
-                      style={{ animationDelay: "180ms" }}
-                    />
-                    <span
-                      className="w-1 h-1 rounded-full bg-gray-400 animate-typing"
-                      style={{ animationDelay: "360ms" }}
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* ==================== INPUT ==================== */}
-          <div className="p-2 bg-white border-t border-gray-100 shrink-0">
+          
+          {!isLoggedIn ? (
             <div
-              className="
-                flex items-center gap-1
-                rounded-2xl
-                bg-gray-50
-                border border-gray-200/80
-                focus-within:border-black focus-within:bg-white
-                focus-within:shadow-[0_0_0_3px_rgba(0,0,0,0.04)]
-                transition-all duration-300
-                pr-1
-              "
+              className="flex-1 flex flex-col items-center justify-center px-5 text-center"
+              style={{
+                background:
+                  "radial-gradient(circle at top left, #fafafa 0%, #f4f4f5 100%)",
+              }}
             >
-              <input
-                ref={inputRef}
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) =>
-                  e.key === "Enter" && !e.shiftKey && handleSend()
-                }
-                placeholder="Ask about products..."
-                disabled={loading}
-                className="
-                  flex-1 bg-transparent text-[11.5px] text-gray-800
-                  px-2.5 py-2 outline-none
-                  placeholder:text-gray-400
-                  disabled:opacity-50
-                "
-              />
+              <div className="w-14 h-14 rounded-full bg-white border border-gray-200 flex items-center justify-center mb-3 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15)]">
+                <FiLock size={20} className="text-gray-400" />
+              </div>
+
+              <h4 className="text-[13px] font-bold text-gray-900 mb-1">
+                Login required
+              </h4>
+              <p className="text-[11px] text-gray-500 leading-relaxed mb-4 max-w-[210px]">
+                Please sign in to chat with our AI assistant.
+              </p>
+
               <button
-                onClick={() => handleSend()}
-                disabled={loading || !input.trim()}
-                aria-label="Send message"
+                onClick={() => {
+                  setOpen(false);
+                  openAuthModal("signin");
+                }}
                 className="
-                  shrink-0 w-7 h-7 rounded-lg
-                  flex items-center justify-center
-                  bg-gradient-to-br from-black to-[#1f1f1f]
-                  text-white
-                  hover:scale-105 active:scale-95
-                  disabled:opacity-30 disabled:hover:scale-100
-                  shadow-[0_4px_12px_-4px_rgba(0,0,0,0.5)]
+                  inline-flex items-center gap-1.5
+                  px-4 py-2 rounded-full
+                  bg-black text-white
+                  text-[11.5px] font-semibold
+                  hover:bg-gray-800 hover:scale-[1.03]
+                  active:scale-[0.97]
                   transition-all duration-300
                 "
               >
-                {loading ? (
-                  <div className="w-2.5 h-2.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <FiSend size={11} />
-                )}
+                <FiLogIn size={12} />
+                Sign In
               </button>
+
+              <p className="mt-3 text-[9px] text-gray-400 tracking-wide uppercase">
+                Secured by Clerk
+              </p>
             </div>
-          </div>
+          ) : (
+            <>
+              
+              <div
+                className="
+                  flex-1 overflow-y-auto px-2.5 py-2.5 space-y-2
+                  chat-scroll
+                "
+                style={{
+                  background:
+                    "radial-gradient(circle at top left, #fafafa 0%, #f4f4f5 100%)",
+                }}
+              >
+                {messages.map((m, i) => {
+                  const isUser = m.role === "user";
+                  const isFallback = !isUser && m.fallback;
+
+                  return (
+                    <div
+                      key={i}
+                      className={`flex items-end gap-1.5 animate-[msgIn_0.3s_cubic-bezier(.16,1,.3,1)] ${
+                        isUser ? "justify-end" : "justify-start"
+                      }`}
+                      style={{ animationDelay: `${Math.min(i * 25, 120)}ms` }}
+                    >
+                      {!isUser && (
+                        <div className="shrink-0 rounded-full bg-gradient-to-br from-black to-gray-700 flex items-center justify-center ring-1 ring-black/5 mb-0.5 w-5 h-5">
+                          <RiChatVoiceAiLine className="text-white" size={10} />
+                        </div>
+                      )}
+
+                      <div
+                        className={`
+                          max-w-[82%] px-2.5 py-1.5 rounded-2xl
+                          text-[12px] leading-[1.5]
+                          ${
+                            isUser
+                              ? "bg-gradient-to-br from-black to-[#1f1f1f] text-white rounded-br-md shadow-[0_4px_12px_-4px_rgba(0,0,0,0.4)] whitespace-pre-wrap"
+                              : "bg-white text-gray-800 border border-gray-100/80 rounded-bl-md shadow-[0_2px_8px_-2px_rgba(0,0,0,0.06)]"
+                          }
+                        `}
+                      >
+                        {isUser ? (
+                          m.content
+                        ) : (
+                          <div className="break-words">
+                            <ReactMarkdown
+                              remarkPlugins={[remarkGfm]}
+                              components={markdownComponents}
+                            >
+                              {m.content}
+                            </ReactMarkdown>
+
+                           
+                            {isFallback && m.whatsapp && (
+                              <a
+                                href={m.whatsapp}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="
+                                  group mt-2 flex items-center justify-between gap-2
+                                  rounded-xl
+                                  bg-gradient-to-br from-[#25D366] to-[#1ea952]
+                                  px-2.5 py-1.5
+                                  text-white
+                                  shadow-[0_6px_18px_-6px_rgba(37,211,102,0.7)]
+                                  hover:shadow-[0_8px_24px_-6px_rgba(37,211,102,0.9)]
+                                  hover:-translate-y-0.5
+                                  active:scale-[0.98]
+                                  transition-all duration-300
+                                "
+                              >
+                                <span className="flex items-center gap-1.5">
+                                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/25 backdrop-blur-sm ring-1 ring-white/30">
+                                    <FaWhatsapp size={11} />
+                                  </span>
+                                  <span className="flex flex-col leading-tight">
+                                    <span className="text-[7.5px] font-bold uppercase tracking-[0.14em] text-white/85">
+                                      Quick chat
+                                    </span>
+                                    <span className="text-[10.5px] font-bold">
+                                      Message on WhatsApp
+                                    </span>
+                                  </span>
+                                </span>
+                                <FiArrowUpRight
+                                  size={11}
+                                  className="shrink-0 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                                />
+                              </a>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+
+               
+                {showSuggestions && (
+                  <div className="pt-1 animate-[msgIn_0.5s_cubic-bezier(.16,1,.3,1)]">
+                    <p className="text-[9px] font-bold uppercase tracking-wider text-gray-400 px-1 mb-1.5">
+                      Try asking
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {SUGGESTIONS.map((s, i) => (
+                        <button
+                          key={i}
+                          onClick={() => handleSend(s.label)}
+                          className="
+                            group inline-flex items-center gap-1
+                            px-2 py-1 rounded-full
+                            bg-white border border-gray-200/80
+                            text-[10px] font-medium text-gray-700
+                            hover:border-black hover:bg-black hover:text-white
+                            active:scale-95
+                            transition-all duration-300
+                            shadow-sm hover:shadow-[0_4px_12px_-2px_rgba(0,0,0,0.2)]
+                          "
+                        >
+                          <span className="shrink-0">{s.icon}</span>
+                          {s.label}
+                          <FiArrowUpRight
+                            size={8}
+                            className="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                
+                {loading && (
+                  <div className="flex items-end gap-1.5 animate-[msgIn_0.3s_ease]">
+                    <div className="shrink-0 w-5 h-5 rounded-full bg-gradient-to-br from-black to-gray-700 flex items-center justify-center ring-1 ring-black/5 mb-0.5">
+                      <RiChatVoiceAiLine className="text-white" size={10} />
+                    </div>
+                    <div className="bg-white border border-gray-100/80 px-3 py-2 rounded-2xl rounded-bl-md shadow-[0_2px_8px_-2px_rgba(0,0,0,0.06)]">
+                      <div className="flex gap-1 items-center h-2">
+                        <span
+                          className="w-1 h-1 rounded-full bg-gray-400 animate-typing"
+                          style={{ animationDelay: "0ms" }}
+                        />
+                        <span
+                          className="w-1 h-1 rounded-full bg-gray-400 animate-typing"
+                          style={{ animationDelay: "180ms" }}
+                        />
+                        <span
+                          className="w-1 h-1 rounded-full bg-gray-400 animate-typing"
+                          style={{ animationDelay: "360ms" }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div ref={messagesEndRef} />
+              </div>
+
+              
+              <div className="p-2 bg-white border-t border-gray-100 shrink-0">
+                <div
+                  className="
+                    flex items-center gap-1
+                    rounded-2xl
+                    bg-gray-50
+                    border border-gray-200/80
+                    focus-within:border-black focus-within:bg-white
+                    focus-within:shadow-[0_0_0_3px_rgba(0,0,0,0.04)]
+                    transition-all duration-300
+                    pr-1
+                  "
+                >
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) =>
+                      e.key === "Enter" && !e.shiftKey && handleSend()
+                    }
+                    placeholder="Ask about products..."
+                    disabled={loading}
+                    className="
+                      flex-1 bg-transparent text-[11.5px] text-gray-800
+                      px-2.5 py-2 outline-none
+                      placeholder:text-gray-400
+                      disabled:opacity-50
+                    "
+                  />
+                  <button
+                    onClick={() => handleSend()}
+                    disabled={loading || !input.trim()}
+                    aria-label="Send message"
+                    className="
+                      shrink-0 w-7 h-7 rounded-lg
+                      flex items-center justify-center
+                      bg-gradient-to-br from-black to-[#1f1f1f]
+                      text-white
+                      hover:scale-105 active:scale-95
+                      disabled:opacity-30 disabled:hover:scale-100
+                      shadow-[0_4px_12px_-4px_rgba(0,0,0,0.5)]
+                      transition-all duration-300
+                    "
+                  >
+                    {loading ? (
+                      <div className="w-2.5 h-2.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <FiSend size={11} />
+                    )}
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
 
-      {/* ================================================================
-          WHATSAPP
-          ================================================================ */}
+      
       <a
         href="https://wa.me/923406500029"
         target="_blank"
@@ -445,9 +542,7 @@ export default function FloatingButtons({ user }) {
         </span>
       </a>
 
-      {/* ================================================================
-          CHATBOT TOGGLE
-          ================================================================ */}
+      
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label="Chatbot"
@@ -486,9 +581,7 @@ export default function FloatingButtons({ user }) {
         )}
       </button>
 
-      {/* ================================================================
-          ANIMATIONS + CUSTOM SCROLLBAR
-          ================================================================ */}
+      
       <style>{`
         @keyframes chatPop {
           0%   { opacity: 0; transform: translateY(18px) scale(0.94); }

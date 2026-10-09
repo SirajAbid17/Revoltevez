@@ -15,7 +15,7 @@ export default function ProfileModal({ isOpen, onClose }) {
   const { user } = useAppSelector((s) => s.auth);
   const { signOut } = useClerk();
 
-  // Body scroll lock
+
   useEffect(() => {
     if (isOpen) document.body.style.overflow = "hidden";
     else document.body.style.overflow = "";
@@ -24,7 +24,7 @@ export default function ProfileModal({ isOpen, onClose }) {
     };
   }, [isOpen]);
 
-  // ESC close
+  
   useEffect(() => {
     const handleEsc = (e) => e.key === "Escape" && isOpen && onClose();
     window.addEventListener("keydown", handleEsc);
@@ -53,19 +53,19 @@ export default function ProfileModal({ isOpen, onClose }) {
     : "Recent";
 
   return (
-    /* ================= OUTER — CENTER ================= */
+  
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-hidden"
       role="dialog"
       aria-modal="true"
     >
-      {/* Backdrop — strong blur */}
+     
       <div
         onClick={onClose}
         className="absolute inset-0 bg-black/50 backdrop-blur-xl animate-[fadeIn_0.25s_ease]"
       />
 
-      {/* ================= MODAL CARD ================= */}
+     
       <div
         className="
           relative z-10 w-full max-w-[380px]
@@ -77,7 +77,7 @@ export default function ProfileModal({ isOpen, onClose }) {
           animate-[popIn_0.35s_cubic-bezier(.2,.9,.3,1.2)]
         "
       >
-        {/* Close */}
+       
         <button
           onClick={onClose}
           aria-label="Close"
@@ -94,9 +94,9 @@ export default function ProfileModal({ isOpen, onClose }) {
         </button>
 
         <div className="px-6 pt-7 pb-5">
-          {/* ================= AVATAR + NAME ================= */}
+        
           <div className="flex flex-col items-center text-center">
-            {/* Avatar */}
+           
             <div className="relative mb-4">
               {user.photoURL ? (
                 <img
@@ -110,24 +110,24 @@ export default function ProfileModal({ isOpen, onClose }) {
                 </div>
               )}
 
-              {/* Verified dot */}
+            
               <span className="absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full bg-white flex items-center justify-center shadow-md">
                 <FiCheckCircle className="text-green-500" size={18} />
               </span>
             </div>
 
-            {/* Name */}
+           
             <h2 className="text-[20px] font-semibold tracking-[-0.03em] leading-tight text-[#111]">
               {user.name || "User"}
             </h2>
 
-            {/* Email */}
+            
             <p className="mt-1 text-[12px] text-gray-500 flex items-center gap-1.5">
               <FiMail size={12} />
               {user.email}
             </p>
 
-            {/* Role badge */}
+            
             {user.role === "admin" && (
               <span className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black text-white text-[10px] font-bold tracking-wider uppercase">
                 <FiShield size={10} />
@@ -136,7 +136,7 @@ export default function ProfileModal({ isOpen, onClose }) {
             )}
           </div>
 
-          {/* ================= INFO LIST ================= */}
+       
           <div className="mt-6 space-y-2">
             <InfoRow
               icon={<FiUser size={13} />}
@@ -162,7 +162,7 @@ export default function ProfileModal({ isOpen, onClose }) {
             />
           </div>
 
-          {/* ================= SIGN OUT ================= */}
+         
           <button
             onClick={handleSignOut}
             className="
@@ -180,7 +180,7 @@ export default function ProfileModal({ isOpen, onClose }) {
             Sign Out
           </button>
 
-          {/* ================= BRAND FOOTER ================= */}
+         
           <div className="mt-4 pt-4 border-t border-gray-100 text-center">
             <div className="inline-flex items-center gap-1.5 text-[10px] text-gray-400 tracking-wide">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
@@ -190,7 +190,7 @@ export default function ProfileModal({ isOpen, onClose }) {
         </div>
       </div>
 
-      {/* ================= ANIMATIONS ================= */}
+     
       <style>{`
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes popIn {
@@ -211,7 +211,7 @@ export default function ProfileModal({ isOpen, onClose }) {
   );
 }
 
-/* ================= INFO ROW ================= */
+
 function InfoRow({ icon, label, value, valueClass = "text-gray-800" }) {
   return (
     <div className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-gray-50 border border-gray-100">

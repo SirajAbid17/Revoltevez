@@ -5,7 +5,7 @@ const feedbackController = require("../controllers/feedbackController");
 
 const router = express.Router();
 
-// All admin feedback routes require admin
+
 router.use(authenticate, requireRole("admin"));
 
 router.get("/", feedbackController.getAllFeedback);

@@ -13,7 +13,7 @@ import {
 } from "react-icons/fi";
 
 export default function AboutDetail() {
-  // ============ CORE VALUES ============
+ 
   const values = [
     {
       icon: <FiZap size={18} />,
@@ -32,7 +32,7 @@ export default function AboutDetail() {
     },
   ];
 
-  // ============ BENEFITS ============
+ 
   const benefits = [
     {
       icon: <FiTag size={16} />,
@@ -66,7 +66,7 @@ export default function AboutDetail() {
 
   return (
     <div className="min-h-screen bg-[#f7f7f5]">
-      {/* ================= HERO ================= */}
+     
       <section className="px-5 sm:px-8 lg:px-12 pt-2 pb-8 sm:pt-4 sm:pb-10">
         <div className="max-w-[1000px] mx-auto text-center">
           {/* Badge */}
@@ -77,24 +77,24 @@ export default function AboutDetail() {
             </span>
           </div>
 
-          {/* Heading */}
+         
           <h1 className="text-[26px] sm:text-[36px] lg:text-[44px] font-semibold tracking-[-0.04em] leading-[1.05] text-[#111] mb-2.5">
             Revoltevez
             <span className="text-gray-300"> (Private) Limited</span>
           </h1>
 
-          {/* Tagline */}
+         
           <p className="text-[11.5px] sm:text-[13px] font-semibold tracking-[0.2em] text-gray-500 uppercase mb-3">
             Think Unlimited
           </p>
 
-          {/* Description */}
+          
           <p className="max-w-xl mx-auto text-[13px] sm:text-[13.5px] text-gray-500 leading-relaxed">
             Building the future of sustainable transportation with
             high-performance electric vehicles.
           </p>
 
-          {/* Keywords */}
+         
           <div className="mt-5 flex flex-wrap items-center justify-center gap-1.5">
             {["Electric Vehicles", "Mobility", "Technology"].map((tag) => (
               <span
@@ -108,7 +108,7 @@ export default function AboutDetail() {
         </div>
       </section>
 
-      {/* ================= CORE VALUES ================= */}
+     
       <section className="bg-[#f7f7f5] px-5 sm:px-8 lg:px-12 py-8 sm:py-10">
         <div className="max-w-[1000px] mx-auto">
           {/* Heading */}
@@ -125,7 +125,7 @@ export default function AboutDetail() {
             </h2>
           </div>
 
-          {/* Grid */}
+          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {values.map((v, i) => (
               <div
@@ -151,10 +151,10 @@ export default function AboutDetail() {
         </div>
       </section>
 
-      {/* ================= WHY CHOOSE US ================= */}
+     
       <section className="px-5 sm:px-8 lg:px-12 py-8 sm:py-10">
         <div className="max-w-[1000px] mx-auto">
-          {/* Heading */}
+         
           <div className="text-center mb-6">
             <div className="flex items-center justify-center gap-2.5 mb-2">
               <span className="w-5 h-px bg-black" />
@@ -171,7 +171,6 @@ export default function AboutDetail() {
             </p>
           </div>
 
-          {/* Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {benefits.map((b, i) => (
               <div
@@ -186,29 +185,29 @@ export default function AboutDetail() {
                   transition-all duration-400
                 "
               >
-                {/* Number */}
+              
                 <span className="absolute top-3 right-3 text-[8.5px] font-bold tracking-[0.15em] text-gray-300">
                   {String(i + 1).padStart(2, "0")}
                 </span>
 
-                {/* Icon */}
+               
                 <div
                   className={`w-9 h-9 rounded-lg bg-gradient-to-br ${b.gradient} text-white flex items-center justify-center mb-3 shadow-sm group-hover:scale-105 transition-transform duration-300`}
                 >
                   {b.icon}
                 </div>
 
-                {/* Title */}
+               
                 <h3 className="text-[13px] font-bold text-[#111] mb-1 tracking-tight">
                   {b.title}
                 </h3>
 
-                {/* Description */}
+              
                 <p className="text-[11.5px] text-gray-500 leading-relaxed mb-2.5">
                   {b.desc}
                 </p>
 
-                {/* Tag */}
+                
                 <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-gray-50 border border-gray-100">
                   <span className="w-1 h-1 rounded-full bg-green-500" />
                   <span className="text-[9px] font-bold text-gray-600 uppercase tracking-wider">
@@ -216,7 +215,7 @@ export default function AboutDetail() {
                   </span>
                 </div>
 
-                {/* Corner accent */}
+               
                 <div className="absolute -bottom-8 -right-8 w-20 h-20 rounded-full bg-gray-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
               </div>
             ))}
@@ -224,7 +223,7 @@ export default function AboutDetail() {
         </div>
       </section>
 
-      {/* ================= CTA ================= */}
+     
       <section className="px-5 sm:px-8 lg:px-12 pb-10">
         <div className="max-w-[1000px] mx-auto">
           <div className="relative overflow-hidden rounded-2xl bg-black text-white p-6 sm:p-8">

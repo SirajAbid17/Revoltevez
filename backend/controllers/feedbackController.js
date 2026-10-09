@@ -1,9 +1,5 @@
 const Feedback = require("../models/Feedback");
 
-// ============================================
-// PUBLIC — Check if logged-in user already submitted
-// GET /api/feedback/mine?email=xxx
-// ============================================
 exports.getMyFeedback = async (req, res, next) => {
   try {
     const { email } = req.query;
@@ -29,10 +25,6 @@ exports.getMyFeedback = async (req, res, next) => {
   }
 };
 
-// ============================================
-// PUBLIC — Submit new feedback (ONE PER EMAIL)
-// POST /api/feedback
-// ============================================
 exports.submitFeedback = async (req, res, next) => {
   try {
     const { name, email, role, rating, message, avatar, provider } = req.body;
@@ -59,7 +51,7 @@ exports.submitFeedback = async (req, res, next) => {
       });
     }
 
-    // ⭐ CHECK: one email = one feedback
+    
     const existing = await Feedback.findOne({
       email: email.toLowerCase().trim(),
     });
@@ -91,7 +83,7 @@ exports.submitFeedback = async (req, res, next) => {
       feedback,
     });
   } catch (err) {
-    // Duplicate key error (race condition safeguard)
+    
     if (err.code === 11000) {
       return res.status(409).json({
         success: false,
@@ -102,10 +94,7 @@ exports.submitFeedback = async (req, res, next) => {
   }
 };
 
-// ============================================
-// PUBLIC — Get approved feedback
-// GET /api/feedback
-// ============================================
+
 exports.getApprovedFeedback = async (req, res, next) => {
   try {
     const feedbacks = await Feedback.find({ status: "approved" })
@@ -122,10 +111,7 @@ exports.getApprovedFeedback = async (req, res, next) => {
   }
 };
 
-// ============================================
-// ADMIN — Get all
-// GET /api/admin/feedback
-// ============================================
+
 exports.getAllFeedback = async (req, res, next) => {
   try {
     const { status } = req.query;
@@ -151,10 +137,7 @@ exports.getAllFeedback = async (req, res, next) => {
   }
 };
 
-// ============================================
-// ADMIN — Update status
-// PUT /api/admin/feedback/:id/status
-// ============================================
+
 exports.updateFeedbackStatus = async (req, res, next) => {
   try {
     const { status } = req.body;
@@ -179,10 +162,7 @@ exports.updateFeedbackStatus = async (req, res, next) => {
   }
 };
 
-// ============================================
-// ADMIN — Reply
-// PUT /api/admin/feedback/:id/reply
-// ============================================
+
 exports.replyToFeedback = async (req, res, next) => {
   try {
     const { reply } = req.body;
@@ -202,10 +182,7 @@ exports.replyToFeedback = async (req, res, next) => {
   }
 };
 
-// ============================================
-// ADMIN — Delete
-// DELETE /api/admin/feedback/:id
-// ============================================
+
 exports.deleteFeedback = async (req, res, next) => {
   try {
     const feedback = await Feedback.findByIdAndDelete(req.params.id);

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   FiX,
@@ -10,6 +10,8 @@ import {
   FiLogOut,
 } from "react-icons/fi";
 import { useClerk } from "@clerk/clerk-react";
+import { useAppDispatch } from "../../store/hooks";
+import { clearUser, logoutUser } from "../../store/slices/authSlice";
 
 export default function MobileDrawer({
   isOpen,
@@ -23,8 +25,13 @@ export default function MobileDrawer({
   onLogin,
 }) {
   const { signOut } = useClerk();
+  const dispatch = useAppDispatch();
+  const [signingOut, setSigningOut] = useState(false);
 
-  /* ============ LOCK BODY SCROLL WHEN OPEN ============ */
+
+  const isAdmin = isLoggedIn && !signingOut && user?.role === "admin";
+
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -36,7 +43,6 @@ export default function MobileDrawer({
     };
   }, [isOpen]);
 
-  /* ============ ESC CLOSE ============ */
   useEffect(() => {
     const onEsc = (e) => {
       if (e.key === "Escape" && isOpen) onClose();
@@ -45,9 +51,20 @@ export default function MobileDrawer({
     return () => window.removeEventListener("keydown", onEsc);
   }, [isOpen, onClose]);
 
+  
+  useEffect(() => {
+    if (!isOpen) {
+      setSigningOut(false);
+    }
+  }, [isOpen]);
+
+  
   const handleSignOut = async () => {
+    setSigningOut(true); 
+    dispatch(clearUser()); 
     onClose();
-    await signOut({ redirectUrl: "/" });
+    await dispatch(logoutUser()); 
+    await signOut({ redirectUrl: "/" }); 
   };
 
   return (
@@ -58,13 +75,13 @@ export default function MobileDrawer({
         ${isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}
       `}
     >
-      {/* Backdrop */}
+     
       <div
         onClick={onClose}
         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
       />
 
-      {/* Drawer panel */}
+     
       <div
         className={`
           absolute top-0 right-0 bottom-0
@@ -76,7 +93,7 @@ export default function MobileDrawer({
         `}
         style={{ paddingTop: "env(safe-area-inset-top)" }}
       >
-        {/* ============ DRAWER HEADER ============ */}
+        
         <div className="flex items-center justify-between px-5 h-[64px] border-b border-gray-100 shrink-0">
           <span className="text-[10px] font-bold tracking-[0.3em] text-gray-400 uppercase">
             Menu
@@ -90,8 +107,8 @@ export default function MobileDrawer({
           </button>
         </div>
 
-        {/* ============ USER CARD ============ */}
-        {isLoggedIn && user && (
+       
+        {isLoggedIn && !signingOut && user && (
           <div className="px-4 pt-4 shrink-0">
             <button
               onClick={() => {
@@ -124,7 +141,7 @@ export default function MobileDrawer({
           </div>
         )}
 
-        {/* ============ NAV LINKS ============ */}
+        
         <nav className="flex-1 overflow-y-auto px-3 py-4 hide-scrollbar">
           <p className="px-3 mb-2 text-[9.5px] font-bold tracking-[0.25em] text-gray-400 uppercase">
             Navigate
@@ -166,8 +183,8 @@ export default function MobileDrawer({
             })}
           </div>
 
-          {/* ============ ADMIN LINK ============ */}
-          {user?.role === "admin" && (
+          
+          {isAdmin && (
             <>
               <p className="px-3 mt-6 mb-2 text-[9.5px] font-bold tracking-[0.25em] text-gray-400 uppercase">
                 Admin
@@ -192,8 +209,8 @@ export default function MobileDrawer({
             </>
           )}
 
-          {/* ============ ACCOUNT ============ */}
-          {isLoggedIn && (
+         
+          {isLoggedIn && !signingOut && (
             <>
               <p className="px-3 mt-6 mb-2 text-[9.5px] font-bold tracking-[0.25em] text-gray-400 uppercase">
                 Account
@@ -227,19 +244,22 @@ export default function MobileDrawer({
 
               <button
                 onClick={handleSignOut}
-                className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-[13.5px] font-medium text-red-600 hover:bg-red-50 transition-all"
+                disabled={signingOut}
+                className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-[13.5px] font-medium text-red-600 hover:bg-red-50 transition-all disabled:opacity-50"
               >
                 <span className="text-[16px]">
                   <FiLogOut size={15} />
                 </span>
-                <span className="flex-1 text-left">Sign Out</span>
+                <span className="flex-1 text-left">
+                  {signingOut ? "Signing out..." : "Sign Out"}
+                </span>
               </button>
             </>
           )}
         </nav>
 
-        {/* ============ LOGIN FOOTER ============ */}
-        {!isLoggedIn && (
+       
+        {!isLoggedIn && !signingOut && (
           <div className="p-4 border-t border-gray-100 shrink-0">
             <button
               onClick={onLogin}

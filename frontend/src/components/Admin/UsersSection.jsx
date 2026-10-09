@@ -11,11 +11,23 @@ export default function UsersSection({
   onChangeRole,
   onDeleteUser,
 }) {
-  const filtered = users.filter(
-    (u) =>
-      (u.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (u.email || "").toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  
+  const filtered = users
+    .filter(
+      (u) =>
+        (u.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (u.email || "").toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => {
+     
+      if (a.role === "admin" && b.role !== "admin") return -1;
+      if (a.role !== "admin" && b.role === "admin") return 1;
+
+
+      const dateA = new Date(a.createdAt || 0).getTime();
+      const dateB = new Date(b.createdAt || 0).getTime();
+      return dateB - dateA;
+    });
 
   return (
     <div className="space-y-5">

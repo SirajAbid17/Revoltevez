@@ -2,9 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../../config/api";
 
 
-// ============================================
-// ASYNC THUNKS
-// ============================================
+
 
 export const fetchAllUsers = createAsyncThunk(
   "users/fetchAll",
@@ -48,9 +46,7 @@ export const deleteUser = createAsyncThunk(
   }
 );
 
-// ============================================
-// SLICE
-// ============================================
+
 
 const initialState = {
   list: [],
@@ -71,7 +67,7 @@ const usersSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // ----- FETCH ALL -----
+     
       .addCase(fetchAllUsers.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -85,7 +81,7 @@ const usersSlice = createSlice({
         state.error = action.payload;
       })
 
-      // ----- CHANGE ROLE -----
+      
       .addCase(changeUserRole.pending, (state) => {
         state.mutating = true;
         state.mutationError = null;
@@ -102,7 +98,7 @@ const usersSlice = createSlice({
         state.mutationError = action.payload;
       })
 
-      // ----- DELETE -----
+      
       .addCase(deleteUser.pending, (state) => {
         state.mutating = true;
         state.mutationError = null;

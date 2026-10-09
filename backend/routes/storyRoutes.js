@@ -14,16 +14,16 @@ const {
   deleteStory,
 } = require("../controllers/storyController");
 
-/* ---------- PUBLIC ---------- */
+
 router.get("/", getPublicStories);
 
-/* ---------- ADMIN (must be before /:id) ---------- */
+
 router.get("/admin/all", authenticate, requireRole("admin"), getAllStoriesAdmin);
 
-/* ---------- PARAM ---------- */
+
 router.get("/:id", getStoryById);
 
-/* ---------- MUTATIONS (admin only) ---------- */
+
 router.post(
   "/",
   authenticate,

@@ -18,7 +18,7 @@ export default function AuthModal({
   mode: initialMode = "signin",
 }) {
   const [mode, setMode] = useState(initialMode);
-  const [step, setStep] = useState("form"); // "form" | "verify"
+  const [step, setStep] = useState("form"); 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -29,7 +29,7 @@ export default function AuthModal({
   const { signUp, setActive: setSignUpActive, isLoaded: signUpLoaded } = useSignUp();
   const { isSignedIn, isLoaded: authLoaded } = useAuth();
 
-  // Sync mode with parent
+  
   useEffect(() => {
     if (isOpen) {
       setMode(initialMode);
@@ -37,7 +37,7 @@ export default function AuthModal({
     }
   }, [isOpen, initialMode]);
 
-  // Reset on open/close
+  
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -55,14 +55,14 @@ export default function AuthModal({
     };
   }, [isOpen]);
 
-  // ESC close
+  
   useEffect(() => {
     const handleEsc = (e) => e.key === "Escape" && isOpen && onClose();
     window.addEventListener("keydown", handleEsc);
     return () => window.removeEventListener("keydown", handleEsc);
   }, [isOpen, onClose]);
 
-  // Auto close after sign-in
+  
   useEffect(() => {
     if (isOpen && authLoaded && isSignedIn) {
       const t = setTimeout(() => onClose(), 400);
@@ -75,7 +75,7 @@ export default function AuthModal({
   const handleChange = (e) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  // ================= SIGN IN =================
+  
   const handleSignIn = async () => {
     if (!signInLoaded) return;
 
@@ -92,7 +92,7 @@ export default function AuthModal({
     }
   };
 
-  // ================= SIGN UP =================
+  
   const handleSignUp = async () => {
     if (!signUpLoaded) return;
 
@@ -106,14 +106,14 @@ export default function AuthModal({
       password: form.password,
     });
 
-    // Case 1: Direct complete (email verification OFF)
+    
     if (result.status === "complete") {
       await setSignUpActive({ session: result.createdSessionId });
       onClose();
       return;
     }
 
-    // Case 2: Verification needed (email verification ON)
+    
     if (result.status === "missing_requirements") {
       const needsEmail = result.unverifiedFields?.includes("email_address");
 
@@ -126,11 +126,11 @@ export default function AuthModal({
       }
     }
 
-    // Case 3: Something else
+   
     setError("Sign up incomplete. Please check your details.");
   };
 
-  // ================= VERIFY OTP =================
+ 
   const handleVerifyOTP = async () => {
     if (!otp.trim() || otp.length < 6) {
       setError("Enter the 6-digit code from your email");
@@ -149,7 +149,7 @@ export default function AuthModal({
     }
   };
 
-  // ================= SUBMIT DISPATCHER =================
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (loading) return;
@@ -177,7 +177,7 @@ export default function AuthModal({
     }
   };
 
-  // ================= GOOGLE =================
+ 
   const handleGoogle = async () => {
     if (loading) return;
     setError("");
@@ -208,14 +208,14 @@ export default function AuthModal({
     }
   };
 
-  // ================= RESEND OTP =================
+ 
   const handleResendOTP = async () => {
     try {
       setError("");
       await signUp.prepareEmailAddressVerification({
         strategy: "email_code",
       });
-      setError("✅ New code sent to your email");
+      setError("New code sent to your email");
     } catch (err) {
       setError(
         err.errors?.[0]?.longMessage || "Could not resend code"
@@ -229,13 +229,13 @@ export default function AuthModal({
       role="dialog"
       aria-modal="true"
     >
-      {/* Backdrop */}
+      
       <div
         onClick={onClose}
         className="absolute inset-0 bg-black/40 backdrop-blur-md animate-[fadeIn_0.25s_ease]"
       />
 
-      {/* Modal Card */}
+  
       <div
         className="
           relative z-10 w-full max-w-[380px]
@@ -247,7 +247,7 @@ export default function AuthModal({
           animate-[popIn_0.35s_cubic-bezier(.2,.9,.3,1.2)]
         "
       >
-        {/* Close */}
+       
         <button
           onClick={onClose}
           aria-label="Close"
@@ -264,7 +264,7 @@ export default function AuthModal({
         </button>
 
         <div className="px-6 pt-6 pb-5">
-          {/* Brand */}
+        
           <div className="flex items-center gap-2 mb-3">
             <img
               src="./icons.png"
@@ -276,7 +276,7 @@ export default function AuthModal({
             </span>
           </div>
 
-          {/* ============ OTP VERIFICATION SCREEN ============ */}
+         
           {step === "verify" ? (
             <>
               <button
@@ -354,7 +354,7 @@ export default function AuthModal({
             </>
           ) : (
             <>
-              {/* ============ NORMAL FORM ============ */}
+             
               <h2 className="text-[20px] font-semibold tracking-[-0.03em] leading-tight text-[#111]">
                 {mode === "signin" ? "Welcome back." : "Create account."}
               </h2>
@@ -370,7 +370,7 @@ export default function AuthModal({
                 </div>
               )}
 
-              {/* Tabs */}
+              
               <div className="mt-4 mb-4 relative flex p-1 rounded-full bg-gray-100">
                 <div
                   className={`
@@ -403,7 +403,7 @@ export default function AuthModal({
                 </button>
               </div>
 
-              {/* Form */}
+             
               <form onSubmit={handleSubmit} className="space-y-2.5">
                 {mode === "signup" && (
                   <div className="relative animate-[slideDown_0.3s_ease]">
@@ -486,7 +486,7 @@ export default function AuthModal({
                 </button>
               </form>
 
-              {/* Divider */}
+             
               <div className="my-3.5 flex items-center gap-3">
                 <span className="flex-1 h-px bg-gray-200" />
                 <span className="text-[10px] font-medium text-gray-400 tracking-wider">
@@ -495,7 +495,7 @@ export default function AuthModal({
                 <span className="flex-1 h-px bg-gray-200" />
               </div>
 
-              {/* Google */}
+             
               <button
                 type="button"
                 onClick={handleGoogle}
@@ -530,7 +530,7 @@ export default function AuthModal({
         </div>
       </div>
 
-      {/* Animations + scrollbar hide */}
+     
       <style>{`
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes popIn {

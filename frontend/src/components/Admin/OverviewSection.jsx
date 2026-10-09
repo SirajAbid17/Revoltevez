@@ -12,15 +12,27 @@ export default function OverviewSection({
   initials,
   onChangeRole,
 }) {
-  const filteredUsers = users.filter(
-    (u) =>
-      (u.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (u.email || "").toLowerCase().includes(searchQuery.toLowerCase())
-  );
+ 
+  const filteredUsers = users
+    .filter(
+      (u) =>
+        (u.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (u.email || "").toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => {
+      
+      if (a.role === "admin" && b.role !== "admin") return -1;
+      if (a.role !== "admin" && b.role === "admin") return 1;
+
+     
+      const dateA = new Date(a.createdAt || 0).getTime();
+      const dateB = new Date(b.createdAt || 0).getTime();
+      return dateB - dateA;
+    });
 
   return (
     <div className="space-y-5">
-      {/* Header */}
+     
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 mb-3">
@@ -38,7 +50,7 @@ export default function OverviewSection({
         </div>
       </div>
 
-      {/* Stats */}
+      
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {stats.map((stat, i) => (
           <div
@@ -62,7 +74,7 @@ export default function OverviewSection({
         ))}
       </div>
 
-      {/* Users Table */}
+      
       <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
         <div className="p-4 sm:p-5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>

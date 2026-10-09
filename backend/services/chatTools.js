@@ -3,9 +3,7 @@ const { z } = require("zod");
 const productService = require("./productService");
 const companyData = require("../config/companyData");
 
-/* ============================================================
-   ⭐ NEW — LIST ALL PRODUCTS
-   ============================================================ */
+
 const listAllProductsTool = tool(
   async ({ limit }) => {
     const products = await productService.listAllProducts(limit || 30);
@@ -36,9 +34,7 @@ const listAllProductsTool = tool(
   }
 );
 
-/* ============================================================
-   SEARCH — for specific queries
-   ============================================================ */
+
 const searchProductsTool = tool(
   async ({ query, maxPrice, minPrice, limit }) => {
     const products = await productService.searchProducts({
@@ -80,9 +76,7 @@ const searchProductsTool = tool(
   }
 );
 
-/* ============================================================
-   GET PRODUCT DETAILS
-   ============================================================ */
+
 const getProductDetailsTool = tool(
   async ({ productId }) => {
     const product = await productService.getProductById(productId);
@@ -103,9 +97,7 @@ const getProductDetailsTool = tool(
   }
 );
 
-/* ============================================================
-   CATALOG OVERVIEW
-   ============================================================ */
+
 const getCatalogOverviewTool = tool(
   async () => {
     const overview = await productService.getProductCategories();
@@ -119,9 +111,7 @@ const getCatalogOverviewTool = tool(
   }
 );
 
-/* ============================================================
-   COMPANY INFO
-   ============================================================ */
+
 const getCompanyInfoTool = tool(
   async () => JSON.stringify(companyData),
   {
@@ -132,9 +122,7 @@ const getCompanyInfoTool = tool(
   }
 );
 
-/* ============================================================
-   EXPORT — order matters (list first)
-   ============================================================ */
+
 module.exports = [
   listAllProductsTool,
   searchProductsTool,

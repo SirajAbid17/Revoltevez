@@ -12,6 +12,7 @@ import {
 import { FcGoogle } from "react-icons/fc";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { fetchApprovedFeedback } from "../../../store/slices/feedbackSlice";
+import Loader from "../../common/Loader";
 
 export default function Feedback() {
   const dispatch = useAppDispatch();
@@ -25,7 +26,7 @@ export default function Feedback() {
   const rafRef = useRef(null);
   const offsetRef = useRef(0);
 
-  // Fetch approved on mount
+  
   useEffect(() => {
     dispatch(fetchApprovedFeedback());
   }, [dispatch]);
@@ -37,7 +38,7 @@ export default function Feedback() {
 
   const shouldScroll = approved.length > 3;
 
-  // ============ AUTO-SCROLL ============
+
   useEffect(() => {
     if (!shouldScroll || approved.length === 0) return;
     if (selectedFeedback) return;
@@ -73,7 +74,7 @@ export default function Feedback() {
     };
   }, [shouldScroll, approved.length, isPaused, selectedFeedback]);
 
-  // Lock body scroll when modal open
+ 
   useEffect(() => {
     document.body.style.overflow = selectedFeedback ? "hidden" : "";
     return () => {
@@ -81,7 +82,7 @@ export default function Feedback() {
     };
   }, [selectedFeedback]);
 
-  // ESC to close modal
+ 
   useEffect(() => {
     const handler = (e) => {
       if (e.key === "Escape") setSelectedFeedback(null);
@@ -95,7 +96,7 @@ export default function Feedback() {
   return (
     <>
       <section className="w-full bg-white py-14 sm:py-16 lg:py-20 overflow-hidden">
-        {/* HEADER */}
+       
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
           <div className="text-center mb-10 sm:mb-12">
             <div className="flex items-center justify-center gap-3 mb-4">
@@ -157,12 +158,10 @@ export default function Feedback() {
           </div>
         </div>
 
-        {/* CONTENT */}
+     
         {approvedLoading ? (
-          <div className="text-center py-16">
-            <div className="w-10 h-10 border-3 border-gray-200 border-t-black rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-[12.5px] text-gray-500">Loading reviews...</p>
-          </div>
+         
+          <Loader size="lg" text="Loading reviews..." className="py-16" />
         ) : approved.length === 0 ? (
           <div className="max-w-md mx-auto text-center py-16 px-4">
             <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-5">
@@ -236,7 +235,7 @@ export default function Feedback() {
           </div>
         )}
 
-        {/* CONTROLS */}
+      
         {approved.length > 0 && (
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 px-4">
             {shouldScroll && (
@@ -292,7 +291,7 @@ export default function Feedback() {
         )}
       </section>
 
-      {/* MODAL */}
+     
       {selectedFeedback && (
         <FeedbackModal
           feedback={selectedFeedback}
@@ -304,7 +303,7 @@ export default function Feedback() {
   );
 }
 
-/* REVIEW CARD */
+
 function ReviewCard({ feedback: fb, currentUser, onOpen }) {
   const initials = (fb.name || "U")
     .split(" ")
@@ -430,9 +429,7 @@ function ReviewCard({ feedback: fb, currentUser, onOpen }) {
   );
 }
 
-/* ============================================================
-   FEEDBACK MODAL — Compact Version
-   ============================================================ */
+
 function FeedbackModal({ feedback: fb, currentUser, onClose }) {
   const initials = (fb.name || "U")
     .split(" ")
@@ -462,10 +459,8 @@ function FeedbackModal({ feedback: fb, currentUser, onClose }) {
       role="dialog"
       aria-modal="true"
     >
-      {/* Backdrop */}
       <div className="absolute inset-0 bg-black/50 backdrop-blur-md animate-[fadeIn_0.25s_ease]" />
 
-      {/* Modal — COMPACT */}
       <div
         onClick={(e) => e.stopPropagation()}
         className="
@@ -477,10 +472,8 @@ function FeedbackModal({ feedback: fb, currentUser, onClose }) {
           animate-[popIn_0.3s_cubic-bezier(.2,.9,.3,1.2)]
         "
       >
-        {/* Top accent */}
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-black to-transparent" />
 
-        {/* Close */}
         <button
           onClick={onClose}
           aria-label="Close"
@@ -498,7 +491,6 @@ function FeedbackModal({ feedback: fb, currentUser, onClose }) {
         </button>
 
         <div className="p-5">
-          {/* AVATAR + NAME */}
           <div className="flex items-center gap-3 mb-4">
             <div className="relative shrink-0">
               {hasAvatar ? (
@@ -555,7 +547,6 @@ function FeedbackModal({ feedback: fb, currentUser, onClose }) {
               </div>
             </div>
 
-            {/* Stars */}
             <div className="flex items-center gap-0.5 shrink-0">
               {[1, 2, 3, 4, 5].map((star) => (
                 <FiStar
@@ -572,7 +563,6 @@ function FeedbackModal({ feedback: fb, currentUser, onClose }) {
             </div>
           </div>
 
-          {/* MESSAGE */}
           <div className="relative bg-gray-50 rounded-xl border border-gray-100 p-4 mb-4">
             <div className="absolute top-2 left-3 text-[36px] leading-none text-gray-200 font-serif select-none pointer-events-none">
               "
@@ -582,7 +572,6 @@ function FeedbackModal({ feedback: fb, currentUser, onClose }) {
             </p>
           </div>
 
-          {/* META — compact row */}
           <div className="flex items-center gap-2 text-[10.5px] text-gray-500">
             <span className="truncate flex-1">{fb.email}</span>
             <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
@@ -595,7 +584,6 @@ function FeedbackModal({ feedback: fb, currentUser, onClose }) {
             </span>
           </div>
 
-          {/* BOTTOM */}
           <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />

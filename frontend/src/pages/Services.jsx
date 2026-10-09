@@ -14,7 +14,7 @@ import {
 } from "react-icons/fi";
 
 export default function Services() {
-  // ============ MAIN SERVICES ============
+ 
   const services = [
     {
       icon: <FiTool size={20} />,
@@ -74,7 +74,7 @@ export default function Services() {
     },
   ];
 
-  // ============ PROCESS STEPS ============
+ 
   const steps = [
     {
       num: "01",
@@ -101,7 +101,7 @@ export default function Services() {
   return (
     <div className="min-h-screen bg-[#f7f7f5] pt-0 pb-8 sm:pb-10 px-5 sm:px-8 lg:px-12">
       <div className="max-w-[1000px] mx-auto">
-        {/* ================= HEADER ================= */}
+      
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-3 px-3.5 py-1.5 rounded-full bg-white border border-gray-100 mt-5">
             <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse" />
@@ -125,7 +125,7 @@ export default function Services() {
           </p>
         </div>
 
-        {/* ================= SERVICES GRID ================= */}
+       
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-10">
           {services.map((s, i) => (
             <div
@@ -140,29 +140,29 @@ export default function Services() {
                 transition-all duration-400
               "
             >
-              {/* Number */}
+            
               <span className="absolute top-3 right-3 text-[8.5px] font-bold tracking-[0.15em] text-gray-300">
                 {String(i + 1).padStart(2, "0")}
               </span>
 
-              {/* Icon */}
+           
               <div
                 className={`w-11 h-11 rounded-xl bg-gradient-to-br ${s.gradient} text-white flex items-center justify-center mb-4 shadow-sm group-hover:scale-105 group-hover:rotate-[8deg] transition-transform duration-500`}
               >
                 {s.icon}
               </div>
 
-              {/* Title */}
+           
               <h3 className="text-[14px] font-bold text-[#111] mb-1.5 tracking-tight">
                 {s.title}
               </h3>
 
-              {/* Description */}
+             
               <p className="text-[12px] text-gray-500 leading-relaxed mb-4">
                 {s.desc}
               </p>
 
-              {/* Features list */}
+             
               <ul className="space-y-1.5 mb-4">
                 {s.features.map((f, j) => (
                   <li key={j} className="flex items-center gap-2">
@@ -175,7 +175,7 @@ export default function Services() {
                 ))}
               </ul>
 
-              {/* Tag */}
+            
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gray-50 border border-gray-100">
                 <span className="w-1 h-1 rounded-full bg-green-500" />
                 <span className="text-[9.5px] font-bold text-gray-600 uppercase tracking-wider">
@@ -183,13 +183,13 @@ export default function Services() {
                 </span>
               </div>
 
-              {/* Corner accent */}
+             
               <div className="absolute -bottom-8 -right-8 w-24 h-24 rounded-full bg-gray-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
             </div>
           ))}
         </div>
 
-        {/* ================= HOW IT WORKS ================= */}
+       
         <div className="mb-10">
           <div className="text-center mb-6">
             <div className="flex items-center justify-center gap-2.5 mb-2">
@@ -214,7 +214,7 @@ export default function Services() {
                   transition-all duration-300
                 "
               >
-                {/* Step number */}
+             
                 <div className="w-10 h-10 rounded-xl bg-black text-white flex items-center justify-center text-[13px] font-bold mb-3 group-hover:scale-105 transition-transform duration-300">
                   {step.num}
                 </div>
@@ -226,7 +226,7 @@ export default function Services() {
                   {step.desc}
                 </p>
 
-                {/* Connector line (desktop only) */}
+               
                 {i < steps.length - 1 && (
                   <div className="hidden lg:block absolute top-8 -right-2 w-4 h-px bg-gray-200" />
                 )}
@@ -235,10 +235,10 @@ export default function Services() {
           </div>
         </div>
 
-        {/* ================= CTA ================= */}
+     
         <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:border-gray-200 hover:shadow-[0_15px_40px_rgba(0,0,0,0.06)] transition-all duration-400">
           <div className="relative overflow-hidden rounded-2xl bg-black text-white p-6 sm:p-8">
-            {/* Glow */}
+           
             <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-white/[0.06] blur-3xl pointer-events-none" />
 
             <div className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-4">

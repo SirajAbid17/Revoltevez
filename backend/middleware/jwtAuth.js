@@ -1,16 +1,12 @@
 const User = require("../models/User");
 const { verifyToken } = require("../utils/generateToken");
 
-/**
- * JWT-only middleware
- * Reads JWT from HTTP-only cookie (or Authorization header as fallback)
- */
 module.exports = async function jwtAuth(req, res, next) {
   try {
-    // 1. Cookie se token lo
+   
     let token = req.cookies?.[process.env.COOKIE_NAME || "revoltevez_token"];
 
-    // 2. Fallback: Authorization header
+   
     if (!token && req.headers.authorization?.startsWith("Bearer ")) {
       token = req.headers.authorization.split(" ")[1];
     }

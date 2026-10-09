@@ -10,17 +10,19 @@ export default function Sidebar({
   onSignOut,
 }) {
   return (
-    <aside className="hidden lg:flex flex-col gap-4 w-[260px] xl:w-[280px] shrink-0">
+    <aside className="hidden lg:flex w-[260px] xl:w-[280px] shrink-0">
+     
       <div
         className="
-          fixed top-24
+          fixed
+          top-24
+          bottom-6
           w-[260px] xl:w-[280px]
-          h-[calc(100vh-120px)]
-          flex flex-col gap-4
-          overflow-y-auto hide-scrollbar
+          flex flex-col gap-3
+          overflow-hidden
         "
       >
-        {/* ================= PROFILE CARD ================= */}
+       
         <div className="bg-black rounded-2xl p-5 text-white relative overflow-hidden shrink-0">
           <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-white/[0.08] blur-2xl pointer-events-none" />
 
@@ -41,7 +43,6 @@ export default function Sidebar({
               <p className="text-[13px] font-semibold truncate">
                 {user.name?.split(" ")[0]}
               </p>
-
               <p className="flex items-center gap-1 text-[9.5px] font-bold tracking-[0.12em] uppercase text-amber-400">
                 <FiShield size={9} />
                 Admin
@@ -56,24 +57,22 @@ export default function Sidebar({
           </div>
         </div>
 
-        {/* ================= NAVIGATION (CLEAN) ================= */}
-        <nav className="bg-white rounded-2xl border border-gray-100 p-2.5 shrink-0">
+        
+        <nav
+          className="
+            bg-white rounded-2xl border border-gray-100 p-2.5
+            flex-1 min-h-0 overflow-y-auto hide-scrollbar
+          "
+        >
           {navItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveSection(item.id)}
               className={`
-                w-full
-                flex
-                items-center
-                gap-3
-                px-3.5
-                py-2.5
-                rounded-lg
-                text-[13px]
-                font-medium
-                transition-all
-                duration-200
+                w-full flex items-center gap-3
+                px-3.5 py-2.5 rounded-lg
+                text-[13px] font-medium
+                transition-all duration-200
                 ${
                   activeSection === item.id
                     ? "bg-black text-white shadow-sm"
@@ -82,9 +81,7 @@ export default function Sidebar({
               `}
             >
               <span className="text-[15px]">{item.icon}</span>
-
               <span>{item.label}</span>
-
               {activeSection === item.id && (
                 <FiChevronRight size={12} className="ml-auto" />
               )}
@@ -92,28 +89,17 @@ export default function Sidebar({
           ))}
         </nav>
 
-        {/* ================= SIGN OUT ================= */}
+       
         <button
           onClick={onSignOut}
           className="
-            mt-auto
-            w-full
-            flex
-            items-center
-            gap-3
-            px-4
-            py-2.5
-            rounded-2xl
-            bg-white
-            border
-            border-gray-100
-            text-[13px]
-            font-medium
-            text-red-600
-            hover:bg-red-50
-            hover:border-red-100
-            transition-all
             shrink-0
+            w-full flex items-center gap-3
+            px-4 py-2.5 rounded-2xl
+            bg-white border border-gray-100
+            text-[13px] font-medium text-red-600
+            hover:bg-red-50 hover:border-red-100
+            transition-all
           "
         >
           <FiLogOut size={14} />

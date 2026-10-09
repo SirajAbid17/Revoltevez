@@ -1,10 +1,8 @@
-/**
- * Global error handler
- */
+
 module.exports = (err, req, res, next) => {
   console.error("💥 Error:", err.message);
 
-  // Mongoose validation
+  
   if (err.name === "ValidationError") {
     const errors = Object.values(err.errors).map((e) => e.message);
     return res.status(400).json({
@@ -14,7 +12,7 @@ module.exports = (err, req, res, next) => {
     });
   }
 
-  // Duplicate key
+ 
   if (err.code === 11000) {
     return res.status(409).json({
       success: false,
@@ -22,7 +20,7 @@ module.exports = (err, req, res, next) => {
     });
   }
 
-  // JWT errors
+  
   if (err.name === "JsonWebTokenError") {
     return res.status(401).json({
       success: false,

@@ -9,6 +9,8 @@ import {
   FiSave,
 } from "react-icons/fi";
 import Field from "./Field";
+import Loader from "../common/Loader";
+import { toastError, toastSuccess, getErrMsg } from "../../utils/toast";
 
 export default function AddProductModal({
   isOpen,
@@ -34,7 +36,6 @@ export default function AddProductModal({
   const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef(null);
 
-  // Populate on open (edit or add)
   useEffect(() => {
     if (!isOpen) {
       document.body.style.overflow = "";
@@ -70,7 +71,6 @@ export default function AddProductModal({
     setImageFile(null);
     setErrors({});
     setSubmitting(false);
-
     if (fileInputRef.current) fileInputRef.current.value = "";
 
     return () => {
@@ -78,7 +78,6 @@ export default function AddProductModal({
     };
   }, [isOpen, isEdit, editingProduct]);
 
-  // ESC close
   useEffect(() => {
     const handleEsc = (e) =>
       e.key === "Escape" && isOpen && !submitting && onClose();
@@ -100,10 +99,12 @@ export default function AddProductModal({
 
     if (!file.type.startsWith("image/")) {
       setErrors((p) => ({ ...p, image: "Only image files allowed" }));
+      toastError("Only image files are allowed");
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
       setErrors((p) => ({ ...p, image: "Image must be under 5MB" }));
+      toastError("Image must be under 5MB");
       return;
     }
 
@@ -116,7 +117,6 @@ export default function AddProductModal({
   };
 
   const handleRemoveImage = () => {
-    // In edit mode, don't allow removing (unless new file chosen)
     if (isEdit && !imageFile) return;
     setImageFile(null);
     setImagePreview(isEdit ? editingProduct?.image || "" : "");
@@ -125,10 +125,7 @@ export default function AddProductModal({
 
   const validate = () => {
     const errs = {};
-    // Image required only for ADD (edit already has one)
-    if (!isEdit && !imageFile) {
-      errs.image = "Image is required";
-    }
+    if (!isEdit && !imageFile) errs.image = "Image is required";
     return errs;
   };
 
@@ -137,16 +134,14 @@ export default function AddProductModal({
     const errs = validate();
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
+      toastError("Please fix the errors first");
       return;
     }
 
     setSubmitting(true);
     try {
       const formData = new FormData();
-
-      // Image only if new one selected
       if (imageFile) formData.append("image", imageFile);
-
       formData.append("name", form.name || "");
       formData.append("tagline", form.tagline || "");
       formData.append("topSpeed", form.topSpeed || "");
@@ -157,14 +152,14 @@ export default function AddProductModal({
 
       if (isEdit) {
         await onUpdate({ formData });
+        toastSuccess("Product updated successfully");
       } else {
         await onAdd({ formData });
+        toastSuccess("Product added successfully");
       }
     } catch (err) {
-      console.error("Submit error:", err);
-      alert(
-        err.response?.data?.error ||
-          `Failed to ${isEdit ? "update" : "add"} product`
+      toastError(
+        getErrMsg(err, `Failed to ${isEdit ? "update" : "add"} product`)
       );
     } finally {
       setSubmitting(false);
@@ -188,7 +183,6 @@ export default function AddProductModal({
         </button>
 
         <div className="p-6">
-          {/* Header — dynamic title */}
           <div className="flex items-center gap-3 mb-5">
             <div className="w-10 h-10 rounded-xl bg-black text-white flex items-center justify-center">
               <FiPackage size={18} />
@@ -206,7 +200,7 @@ export default function AddProductModal({
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-3.5">
-            {/* Image */}
+           
             <div>
               <label className="block text-[11px] font-bold uppercase tracking-[0.1em] text-gray-500 mb-1.5">
                 Product Image {!isEdit && "*"}
@@ -218,7 +212,6 @@ export default function AddProductModal({
               </label>
 
               <div className="flex gap-3">
-                {/* Preview */}
                 <div className="shrink-0 w-20 h-20 rounded-lg bg-gray-100 border border-gray-200 overflow-hidden flex items-center justify-center relative group">
                   {imagePreview ? (
                     <>
@@ -227,7 +220,6 @@ export default function AddProductModal({
                         alt="preview"
                         className="w-full h-full object-cover"
                       />
-                      {/* Only show remove on non-edit or if new file picked */}
                       {(!isEdit || imageFile) && (
                         <button
                           type="button"
@@ -243,7 +235,6 @@ export default function AddProductModal({
                   )}
                 </div>
 
-                {/* Uploader */}
                 <div className="flex-1">
                   <input
                     ref={fileInputRef}
@@ -298,7 +289,6 @@ export default function AddProductModal({
               </div>
             </div>
 
-            {/* Name + Tagline */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Field
                 label="Product Name"
@@ -316,7 +306,6 @@ export default function AddProductModal({
               />
             </div>
 
-            {/* Specs */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <Field
                 label="Top Speed"
@@ -341,7 +330,6 @@ export default function AddProductModal({
               />
             </div>
 
-            {/* Price + Status */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Field
                 label="Price"
@@ -367,7 +355,6 @@ export default function AddProductModal({
               </div>
             </div>
 
-            {/* Actions */}
             <div className="flex items-center gap-2 pt-3 mt-1 border-t border-gray-100">
               <button
                 type="button"
@@ -384,7 +371,7 @@ export default function AddProductModal({
               >
                 {submitting ? (
                   <>
-                    <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <Loader inline size="xs" color="white" />
                     {isEdit ? "Updating..." : "Uploading..."}
                   </>
                 ) : (

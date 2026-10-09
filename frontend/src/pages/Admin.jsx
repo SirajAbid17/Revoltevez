@@ -7,8 +7,10 @@ import {
   FiUserCheck,
   FiTrendingUp,
   FiMessageSquare,
-  FiBookOpen,          // ← ADDED
+  FiBookOpen,
+  FiBookmark,
 } from "react-icons/fi";
+
 import { useAuth, useClerk } from "@clerk/clerk-react";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
@@ -29,8 +31,11 @@ import OverviewSection from "../components/Admin/OverviewSection";
 import ProductsSection from "../components/Admin/ProductsSection";
 import UsersSection from "../components/Admin/UsersSection";
 import FeedbackSection from "../components/Admin/FeedbackSection";
-import StoriesAdmin from "../components/Admin/StoriesAdmin";   // ← ADDED
+import StoriesAdmin from "../components/Admin/StoriesAdmin";
+import BookingsSection from "../components/Admin/BookingsSection";
 import AddProductModal from "../components/Admin/AddProductModal";
+import Loader from "../components/common/Loader";
+import { toastError, toastSuccess, getErrMsg } from "../utils/toast";
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -38,14 +43,12 @@ export default function Admin() {
   const { signOut } = useClerk();
   const { isLoaded, isSignedIn } = useAuth();
 
-  // ============ REDUX STATE ============
   const { user } = useAppSelector((s) => s.auth);
 
   const {
     adminProducts: products,
     adminLoading: productsLoading,
     adminError: productsError,
-    mutating,
   } = useAppSelector((s) => s.products);
 
   const {
@@ -54,20 +57,17 @@ export default function Admin() {
     error: usersError,
   } = useAppSelector((s) => s.users);
 
-  // ============ LOCAL UI STATE ============
   const [activeSection, setActiveSection] = useState("overview");
   const [searchQuery, setSearchQuery] = useState("");
   const [addProductOpen, setAddProductOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
 
-  // ============ GUARD ============
   useEffect(() => {
     if (!isLoaded) return;
     if (!isSignedIn) return navigate("/");
     if (user && user.role !== "admin") navigate("/");
   }, [isLoaded, isSignedIn, user, navigate]);
 
-  // ============ FETCH DATA ============
   useEffect(() => {
     if (user && user.role === "admin") {
       dispatch(fetchAdminProducts());
@@ -76,11 +76,7 @@ export default function Admin() {
   }, [user, dispatch]);
 
   if (!isLoaded || !user || user.role !== "admin") {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="w-10 h-10 border-3 border-gray-200 border-t-black rounded-full animate-spin" />
-      </div>
-    );
+    return <Loader fullPage size="lg" text="Loading dashboard..." />;
   }
 
   const initials = (name) =>
@@ -91,7 +87,7 @@ export default function Admin() {
       .slice(0, 2)
       .toUpperCase();
 
-  // ============ PRODUCT ACTIONS ============
+  
   const handleAddProduct = async ({ formData }) => {
     const result = await dispatch(createProduct(formData)).unwrap();
     setAddProductOpen(false);
@@ -112,8 +108,9 @@ export default function Admin() {
     if (!confirm("Delete this product?")) return;
     try {
       await dispatch(deleteProduct(id)).unwrap();
+      toastSuccess("Product deleted successfully");
     } catch (err) {
-      alert(err || "Delete failed");
+      toastError(getErrMsg(err, "Delete failed"));
     }
   };
 
@@ -132,21 +129,23 @@ export default function Admin() {
     setEditingProduct(null);
   };
 
-  // ============ USER ACTIONS ============
+  
   const handleDeleteUser = async (id) => {
     if (!confirm("Delete this user?")) return;
     try {
       await dispatch(deleteUser(id)).unwrap();
+      toastSuccess("User deleted successfully");
     } catch (err) {
-      alert(err || "Delete failed");
+      toastError(getErrMsg(err, "Delete failed"));
     }
   };
 
   const handleChangeRole = async (userId, newRole) => {
     try {
       await dispatch(changeUserRole({ userId, role: newRole })).unwrap();
+      toastSuccess(`Role changed to ${newRole}`);
     } catch (err) {
-      alert(err || "Role change failed");
+      toastError(getErrMsg(err, "Role change failed"));
     }
   };
 
@@ -154,7 +153,7 @@ export default function Admin() {
     await signOut({ redirectUrl: "/" });
   };
 
-  // ============ STATS ============
+ 
   const totalUsers = users.length;
   const totalAdmins = users.filter((u) => u.role === "admin").length;
   const totalProducts = products.length;
@@ -187,13 +186,13 @@ export default function Admin() {
     },
   ];
 
-  // ============ NAV ITEMS ============
   const navItems = [
     { id: "overview", label: "Overview", icon: <FiGrid /> },
     { id: "products", label: "Products", icon: <FiPackage /> },
-    { id: "users",    label: "Users",    icon: <FiUsers /> },
+    { id: "users", label: "Users", icon: <FiUsers /> },
     { id: "feedback", label: "Feedback", icon: <FiMessageSquare /> },
-    { id: "stories",  label: "Stories",  icon: <FiBookOpen /> },   // ← ADDED
+    { id: "stories", label: "Stories", icon: <FiBookOpen /> },
+    { id: "bookings", label: "Bookings", icon: <FiBookmark /> },
   ];
 
   return (
@@ -262,8 +261,8 @@ export default function Admin() {
           )}
 
           {activeSection === "feedback" && <FeedbackSection />}
-
-          {activeSection === "stories" && <StoriesAdmin />}          {/* ← ADDED */}
+          {activeSection === "stories" && <StoriesAdmin />}
+          {activeSection === "bookings" && <BookingsSection />}
         </main>
       </div>
 

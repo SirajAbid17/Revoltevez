@@ -1,19 +1,14 @@
 const Product = require("../models/Product");
 const cloudinary = require("../config/cloudinary");
 
-/**
- * Empty string / undefined → "N/A"
- */
+
 const sanitize = (val, fallback = "N/A") => {
   if (val === undefined || val === null) return fallback;
   const trimmed = String(val).trim();
   return trimmed === "" ? fallback : trimmed;
 };
 
-// ============================================
-// PUBLIC — Get all published products
-// GET /api/products
-// ============================================
+
 exports.getPublicProducts = async (req, res, next) => {
   try {
     const products = await Product.find({ status: "published" }).sort({
@@ -30,10 +25,6 @@ exports.getPublicProducts = async (req, res, next) => {
   }
 };
 
-// ============================================
-// PUBLIC — Get single product by ID
-// GET /api/products/:id
-// ============================================
 exports.getProductById = async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -53,10 +44,6 @@ exports.getProductById = async (req, res, next) => {
   }
 };
 
-// ============================================
-// ADMIN — Get all products (published + draft)
-// GET /api/admin/products
-// ============================================
 exports.getAllProducts = async (req, res, next) => {
   try {
     const products = await Product.find().sort({ createdAt: -1 });
@@ -71,17 +58,13 @@ exports.getAllProducts = async (req, res, next) => {
   }
 };
 
-// ============================================
-// ADMIN — Create product (with Cloudinary upload)
-// POST /api/admin/products
-// multipart/form-data: image (file), name, tagline, topSpeed, range, battery, price, status
-// ============================================
+
 exports.createProduct = async (req, res, next) => {
   try {
     const { name, tagline, topSpeed, range, battery, price, status } =
       req.body;
 
-    // Image required
+    
     if (!req.file) {
       return res.status(400).json({
         success: false,
@@ -89,7 +72,7 @@ exports.createProduct = async (req, res, next) => {
       });
     }
 
-    // Cloudinary URL + public_id
+   
     const imageUrl = req.file.path;
     const imagePublicId = req.file.filename;
 
@@ -118,10 +101,7 @@ exports.createProduct = async (req, res, next) => {
   }
 };
 
-// ============================================
-// ADMIN — Update product
-// PUT /api/admin/products/:id
-// ============================================
+
 exports.updateProduct = async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -132,9 +112,9 @@ exports.updateProduct = async (req, res, next) => {
         .json({ success: false, error: "Product not found" });
     }
 
-    // New image uploaded? Delete old from Cloudinary + set new
+   
     if (req.file) {
-      // Delete old image
+    
       if (product.imagePublicId) {
         try {
           await cloudinary.uploader.destroy(product.imagePublicId);
@@ -175,10 +155,7 @@ exports.updateProduct = async (req, res, next) => {
   }
 };
 
-// ============================================
-// ADMIN — Delete product
-// DELETE /api/admin/products/:id
-// ============================================
+
 exports.deleteProduct = async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -189,7 +166,7 @@ exports.deleteProduct = async (req, res, next) => {
         .json({ success: false, error: "Product not found" });
     }
 
-    // Delete image from Cloudinary
+    
     if (product.imagePublicId) {
       try {
         await cloudinary.uploader.destroy(product.imagePublicId);

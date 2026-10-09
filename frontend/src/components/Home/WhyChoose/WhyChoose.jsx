@@ -61,7 +61,7 @@ export default function WhyChoose() {
       <div className="relative max-w-7xl mx-auto px-5 sm:px-8 lg:px-10">
         <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-8 sm:gap-10 lg:gap-14 items-center">
 
-          {/* ============ IMAGE ============ */}
+        
           <div
             className={`
               relative overflow-hidden rounded-2xl sm:rounded-3xl group
@@ -105,9 +105,9 @@ export default function WhyChoose() {
             </div>
           </div>
 
-          {/* ============ CONTENT ============ */}
+         
           <div className="max-w-lg">
-            {/* Eyebrow */}
+           
             <div
               className={`
                 inline-flex items-center gap-2 mb-2.5 sm:mb-3
@@ -121,7 +121,7 @@ export default function WhyChoose() {
               </span>
             </div>
 
-            {/* Title */}
+           
             <h2
               className={`
                 text-[26px] sm:text-[34px] md:text-[40px] lg:text-[44px]
@@ -135,7 +135,7 @@ export default function WhyChoose() {
               <span className="text-gray-400">Live Different.</span>
             </h2>
 
-            {/* Description */}
+           
             <p
               className={`
                 text-gray-600 text-[13px] sm:text-sm leading-relaxed mb-5 sm:mb-6
@@ -148,7 +148,7 @@ export default function WhyChoose() {
               and the way you ride.
             </p>
 
-            {/* Features — tighter */}
+           
             <div className="space-y-2.5 sm:space-y-3 mb-6 sm:mb-7">
               {features.map((feature, i) => (
                 <div
@@ -198,7 +198,7 @@ export default function WhyChoose() {
               ))}
             </div>
 
-            {/* CTA */}
+         
             <div
               className={`
                 transition-all duration-700 ease-out

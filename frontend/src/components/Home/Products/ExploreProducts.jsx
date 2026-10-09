@@ -11,6 +11,7 @@ import {
 } from "react-icons/fi";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { fetchPublicProducts } from "../../../store/slices/productsSlice";
+import Loader from "../../common/Loader";
 
 export default function ExploreProducts() {
   const dispatch = useAppDispatch();
@@ -55,17 +56,16 @@ export default function ExploreProducts() {
     return bikes[(current + offset + bikes.length) % bikes.length];
   };
 
+ 
   if (loading) {
     return (
       <section className="w-full bg-white py-14 sm:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 text-center">
-          <div className="w-10 h-10 border-3 border-gray-200 border-t-black rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-[13px] text-gray-500">Loading products...</p>
-        </div>
+        <Loader size="lg" text="Loading products..." />
       </section>
     );
   }
 
+  
   if (error || bikes.length === 0) {
     return (
       <section className="w-full bg-white py-14 sm:py-16">
@@ -91,7 +91,7 @@ export default function ExploreProducts() {
   return (
     <section className="w-full bg-white text-black py-10 sm:py-12 md:py-14 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
-        {/* HEADING */}
+        
         <div className="text-center mb-7 sm:mb-8 md:mb-10">
           <div className="flex items-center justify-center gap-2.5 mb-2.5">
             <span className="w-6 sm:w-8 h-px bg-black" />
@@ -113,10 +113,10 @@ export default function ExploreProducts() {
           </p>
         </div>
 
-        {/* CAROUSEL — white fades removed */}
+       
         <div className="relative w-full">
           <div className="relative flex items-center justify-center gap-3 md:gap-4 lg:gap-6">
-            {/* LEFT CARD */}
+          
             {previous && (
               <div className="hidden md:block relative w-[22%] h-[220px] lg:h-[280px] rounded-2xl lg:rounded-3xl overflow-hidden shrink-0 opacity-55 scale-[0.88] grayscale-[20%] transition-all duration-700 ease-out group">
                 <img
@@ -136,7 +136,7 @@ export default function ExploreProducts() {
               </div>
             )}
 
-            {/* CENTER CARD */}
+          
             <div className="relative w-full md:w-[54%] lg:w-[52%] h-[280px] sm:h-[320px] md:h-[350px] lg:h-[400px] rounded-2xl lg:rounded-3xl overflow-hidden shrink-0 bg-gray-100 shadow-[0_20px_55px_rgba(0,0,0,0.15)] group">
               <img
                 src={active.image}
@@ -200,7 +200,7 @@ export default function ExploreProducts() {
               )}
             </div>
 
-            {/* RIGHT CARD */}
+         
             {next && (
               <div className="hidden md:block relative w-[22%] h-[220px] lg:h-[280px] rounded-2xl lg:rounded-3xl overflow-hidden shrink-0 opacity-55 scale-[0.88] grayscale-[20%] transition-all duration-700 ease-out group">
                 <img
@@ -221,7 +221,7 @@ export default function ExploreProducts() {
             )}
           </div>
 
-          {/* SPECS */}
+         
           <div className="max-w-3xl mx-auto mt-6 md:mt-8">
             <div className="grid grid-cols-3 border-y border-gray-200">
               <div className="group flex flex-col items-center justify-center py-4 md:py-5 px-2 border-r border-gray-200 hover:bg-gray-50 transition-colors duration-300">
@@ -274,7 +274,7 @@ export default function ExploreProducts() {
             </div>
           </div>
 
-          {/* INDICATORS */}
+         
           {bikes.length > 1 && (
             <div className="flex justify-center items-center gap-1.5 mt-6 md:mt-7">
               {bikes.map((bike, index) => (

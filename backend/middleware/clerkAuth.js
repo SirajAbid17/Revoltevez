@@ -1,10 +1,7 @@
 const { clerkClient, getAuth } = require("@clerk/express");
 const User = require("../models/User");
 
-/**
- * Clerk-only middleware
- * Verifies Clerk session token → ensures MongoDB user exists
- */
+
 module.exports = async function clerkAuth(req, res, next) {
   try {
     const { userId } = getAuth(req);
@@ -34,16 +31,15 @@ module.exports = async function clerkAuth(req, res, next) {
             email.split("@")[0] ||
             "User";
 
-      const hasGoogle = clerkUser.externalAccounts?.some(
-        (a) => a.provider === "google"
-      );
+     
+      const isGoogle = detectGoogleAuth(clerkUser);
 
       user = await User.create({
         clerkId: userId,
         email,
         name,
         photoURL: clerkUser.imageUrl || "",
-        provider: hasGoogle ? "google" : "email",
+        provider: isGoogle ? "google" : "email",
         lastLoginAt: new Date(),
       });
 
@@ -55,12 +51,37 @@ module.exports = async function clerkAuth(req, res, next) {
 
     req.dbUser = user;
     req.clerkUserId = userId;
+    req.authMethod = "clerk";
     next();
   } catch (err) {
-    console.error("❌ Clerk auth error:", err.message);
+    console.error("Clerk auth error:", err.message);
     return res.status(401).json({
       success: false,
       error: "Clerk authentication failed",
     });
   }
 };
+
+
+function detectGoogleAuth(clerkUser) {
+  
+  const hasGoogleExternal = clerkUser.externalAccounts?.some(
+    (a) =>
+      a.provider === "oauth_google" ||
+      a.provider === "google" ||
+      a.provider === "google_oauth"
+  );
+  if (hasGoogleExternal) return true;
+
+ 
+  const primaryEmail =
+    clerkUser.emailAddresses?.find(
+      (e) => e.id === clerkUser.primaryEmailAddressId
+    ) || clerkUser.emailAddresses?.[0];
+
+  if (primaryEmail?.verification?.strategy === "oauth_google") {
+    return true;
+  }
+
+  return false;
+}

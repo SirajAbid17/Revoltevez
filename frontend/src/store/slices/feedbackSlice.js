@@ -1,9 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../../config/api";
 
-// ============================================
-// PUBLIC
-// ============================================
+
 
 export const submitFeedback = createAsyncThunk(
   "feedback/submit",
@@ -33,7 +31,7 @@ export const fetchApprovedFeedback = createAsyncThunk(
   }
 );
 
-// ⭐ NEW — Check if user already submitted
+
 export const fetchMyFeedback = createAsyncThunk(
   "feedback/fetchMine",
   async (email, { rejectWithValue }) => {
@@ -41,7 +39,7 @@ export const fetchMyFeedback = createAsyncThunk(
       const { data } = await api.get(
         `/feedback/mine?email=${encodeURIComponent(email)}`
       );
-      return data; // { hasSubmitted, feedback }
+      return data; 
     } catch (err) {
       return rejectWithValue(
         err.response?.data?.error || "Failed to check feedback"
@@ -50,9 +48,7 @@ export const fetchMyFeedback = createAsyncThunk(
   }
 );
 
-// ============================================
-// ADMIN
-// ============================================
+
 
 export const fetchAllFeedback = createAsyncThunk(
   "feedback/fetchAll",
@@ -103,18 +99,15 @@ export const deleteFeedback = createAsyncThunk(
   }
 );
 
-// ============================================
-// SLICE
-// ============================================
 
 const initialState = {
   approved: [],
   approvedLoading: false,
   approvedError: null,
 
-  myFeedback: null,        // ⭐ user's own feedback
-  myFeedbackLoading: false, // ⭐ loading state
-  myFeedbackChecked: false, // ⭐ true after first check
+  myFeedback: null,        
+  myFeedbackLoading: false, 
+  myFeedbackChecked: false, 
 
   all: [],
   counts: { pending: 0, approved: 0, rejected: 0, total: 0 },
@@ -154,7 +147,7 @@ const feedbackSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // ----- SUBMIT -----
+     
       .addCase(submitFeedback.pending, (state) => {
         state.submitting = true;
         state.submitError = null;
@@ -163,7 +156,7 @@ const feedbackSlice = createSlice({
       .addCase(submitFeedback.fulfilled, (state, action) => {
         state.submitting = false;
         state.submitSuccess = true;
-        state.myFeedback = action.payload; // ⭐ set user's feedback
+        state.myFeedback = action.payload; 
         state.myFeedbackChecked = true;
       })
       .addCase(submitFeedback.rejected, (state, action) => {
@@ -171,7 +164,7 @@ const feedbackSlice = createSlice({
         state.submitError = action.payload;
       })
 
-      // ----- FETCH MY FEEDBACK -----
+     
       .addCase(fetchMyFeedback.pending, (state) => {
         state.myFeedbackLoading = true;
       })
@@ -188,7 +181,7 @@ const feedbackSlice = createSlice({
         state.myFeedback = null;
       })
 
-      // ----- APPROVED (public) -----
+    
       .addCase(fetchApprovedFeedback.pending, (state) => {
         state.approvedLoading = true;
         state.approvedError = null;
@@ -202,7 +195,7 @@ const feedbackSlice = createSlice({
         state.approvedError = action.payload;
       })
 
-      // ----- ALL (admin) -----
+     
       .addCase(fetchAllFeedback.pending, (state) => {
         state.allLoading = true;
         state.allError = null;
@@ -217,7 +210,7 @@ const feedbackSlice = createSlice({
         state.allError = action.payload;
       })
 
-      // ----- UPDATE STATUS -----
+      
       .addCase(updateFeedbackStatus.pending, (state) => {
         state.mutating = true;
       })
@@ -243,7 +236,7 @@ const feedbackSlice = createSlice({
         state.mutating = false;
       })
 
-      // ----- DELETE -----
+    
       .addCase(deleteFeedback.pending, (state) => {
         state.mutating = true;
       })

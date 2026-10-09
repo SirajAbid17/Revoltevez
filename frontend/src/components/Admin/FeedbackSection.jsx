@@ -30,7 +30,7 @@ export default function FeedbackSection() {
 
   const [filter, setFilter] = useState("pending");
 
-  // Fetch on filter change
+
   useEffect(() => {
     dispatch(fetchAllFeedback(filter === "all" ? "all" : filter));
   }, [filter, dispatch]);
@@ -77,7 +77,7 @@ export default function FeedbackSection() {
 
   return (
     <div className="space-y-6">
-      {/* ================= HEADER ================= */}
+     
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 mb-3">
@@ -94,7 +94,7 @@ export default function FeedbackSection() {
           </p>
         </div>
 
-        {/* Live indicator */}
+        
         {counts.pending > 0 && (
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 border border-amber-100">
             <span className="relative flex h-2 w-2">
@@ -108,7 +108,7 @@ export default function FeedbackSection() {
         )}
       </div>
 
-      {/* ================= STATS ================= */}
+     
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard
           label="Pending"
@@ -136,7 +136,7 @@ export default function FeedbackSection() {
         />
       </div>
 
-      {/* ================= FILTER TABS ================= */}
+     
       <div className="flex items-center gap-1.5 bg-white rounded-2xl border border-gray-100 p-1.5 overflow-x-auto hide-scrollbar">
         {filters.map((f) => {
           const active = filter === f.id;
@@ -178,9 +178,9 @@ export default function FeedbackSection() {
         })}
       </div>
 
-      {/* ================= CONTENT ================= */}
+    
       <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-        {/* Sub-header */}
+      
         <div className="p-4 sm:p-5 border-b border-gray-100 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600">
@@ -196,7 +196,7 @@ export default function FeedbackSection() {
             </div>
           </div>
 
-          {/* Refresh icon */}
+        
           <button
             onClick={() =>
               dispatch(fetchAllFeedback(filter === "all" ? "all" : filter))
@@ -260,9 +260,7 @@ export default function FeedbackSection() {
   );
 }
 
-/* ============================================================
-   STAT CARD
-   ============================================================ */
+
 function StatCard({ label, value, icon, gradient }) {
   return (
     <div className="group bg-white rounded-2xl p-4 border border-gray-100 hover:border-gray-200 hover:shadow-[0_10px_30px_rgba(0,0,0,0.05)] hover:-translate-y-0.5 transition-all duration-300">
@@ -283,9 +281,7 @@ function StatCard({ label, value, icon, gradient }) {
   );
 }
 
-/* ============================================================
-   FEEDBACK ADMIN CARD
-   ============================================================ */
+
 function FeedbackAdminCard({
   feedback: fb,
   onApprove,
@@ -333,7 +329,7 @@ function FeedbackAdminCard({
   return (
     <div className="p-4 sm:p-5 hover:bg-gray-50/50 transition-colors">
       <div className="flex gap-4">
-        {/* ============ AVATAR ============ */}
+       
         <div className="shrink-0">
           <div className="relative">
             {hasAvatar ? (
@@ -350,7 +346,7 @@ function FeedbackAdminCard({
               />
             ) : null}
 
-            {/* Initials fallback */}
+          
             <div
               className={`
                 ${hasAvatar ? "hidden" : "flex"}
@@ -362,7 +358,7 @@ function FeedbackAdminCard({
               {initials}
             </div>
 
-            {/* Provider badge */}
+           
             {provider === "google" && (
               <span
                 className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center z-10"
@@ -374,9 +370,9 @@ function FeedbackAdminCard({
           </div>
         </div>
 
-        {/* ============ CONTENT ============ */}
+       
         <div className="flex-1 min-w-0">
-          {/* Top row: name + status + date */}
+         
           <div className="flex flex-wrap items-start justify-between gap-3 mb-2.5">
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 flex-wrap mb-1">
@@ -395,7 +391,7 @@ function FeedbackAdminCard({
                 </span>
               </div>
 
-              {/* Meta row */}
+              
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-gray-500">
                 <span className="flex items-center gap-1">
                   <FiMail size={10} />
@@ -419,7 +415,7 @@ function FeedbackAdminCard({
             </span>
           </div>
 
-          {/* Rating */}
+        
           <div className="flex items-center gap-1 mb-2.5">
             {[1, 2, 3, 4, 5].map((star) => (
               <FiStar
@@ -439,14 +435,14 @@ function FeedbackAdminCard({
             </span>
           </div>
 
-          {/* Message */}
+         
           <div className="relative pl-3 mb-3 border-l-2 border-gray-100">
             <p className="text-[12.5px] text-gray-600 leading-relaxed">
               {fb.message}
             </p>
           </div>
 
-          {/* Admin reply */}
+         
           {fb.reply && (
             <div className="mb-3 flex items-start gap-2 pl-3 border-l-2 border-blue-300 bg-blue-50/40 rounded-r-lg py-2 pr-3">
               <FiAward size={12} className="text-blue-600 shrink-0 mt-0.5" />
@@ -461,7 +457,7 @@ function FeedbackAdminCard({
             </div>
           )}
 
-          {/* Actions */}
+        
           <div className="flex items-center gap-2 flex-wrap">
             {fb.status !== "approved" && (
               <button

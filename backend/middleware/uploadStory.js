@@ -5,7 +5,7 @@ const cloudinary = require("../config/cloudinary");
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder: "revoltevez/stories",              // ← alag folder
+    folder: "revoltevez/stories",              
     allowed_formats: ["jpg", "jpeg", "png", "webp", "gif"],
     transformation: [
       { width: 1600, height: 1000, crop: "limit", quality: "auto:good" },

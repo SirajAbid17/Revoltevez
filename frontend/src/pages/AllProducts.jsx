@@ -4,6 +4,14 @@ import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { fetchPublicProducts } from "../store/slices/productsSlice";
 import ProductsToolbar from "../components/Products/ProductsToolbar";
 import ProductCard from "../components/Products/ProductCard";
+import Loader from "../components/common/Loader";
+
+
+const parsePrice = (priceStr) => {
+  if (!priceStr || priceStr === "N/A") return 0;
+  const num = String(priceStr).replace(/[^0-9.]/g, "");
+  return parseFloat(num) || 0;
+};
 
 export default function AllProducts() {
   const dispatch = useAppDispatch();
@@ -13,28 +21,22 @@ export default function AllProducts() {
     publicError: error,
   } = useAppSelector((s) => s.products);
 
-  // ============ LOCAL UI STATE ============
+ 
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("newest");
   const [priceFilter, setPriceFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  // ============ FETCH ============
+ 
   useEffect(() => {
     dispatch(fetchPublicProducts());
   }, [dispatch]);
 
-  // ============ HELPERS ============
-  const parsePrice = (priceStr) => {
-    if (!priceStr || priceStr === "N/A") return 0;
-    const num = String(priceStr).replace(/[^0-9.]/g, "");
-    return parseFloat(num) || 0;
-  };
-
-  // ============ FILTERED + SORTED ============
+ 
   const filtered = useMemo(() => {
     let list = [...products];
 
+    
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       list = list.filter(
@@ -45,20 +47,22 @@ export default function AllProducts() {
       );
     }
 
+   
     if (statusFilter === "available") {
       list = list.filter((p) => p.status === "published");
     }
 
+    
     if (priceFilter !== "all") {
       list = list.filter((p) => {
         const price = parsePrice(p.price);
-        if (priceFilter === "under-3") return price > 0 && price < 300000;
-        if (priceFilter === "3-4") return price >= 300000 && price <= 400000;
-        if (priceFilter === "above-4") return price > 400000;
+        if (priceFilter === "1-3") return price >= 100000 && price <= 300000;
+        if (priceFilter === "above-3") return price > 300000;
         return true;
       });
     }
 
+    
     list.sort((a, b) => {
       if (sortBy === "newest") {
         return (
@@ -81,7 +85,7 @@ export default function AllProducts() {
     return list;
   }, [products, searchQuery, sortBy, priceFilter, statusFilter]);
 
-  // ============ ACTIVE FILTERS COUNT ============
+  
   const activeFiltersCount =
     (priceFilter !== "all" ? 1 : 0) + (statusFilter !== "all" ? 1 : 0);
 
@@ -90,19 +94,12 @@ export default function AllProducts() {
     setStatusFilter("all");
   };
 
-  // ============ LOADING ============
+  
   if (loading) {
-    return (
-      <div className="min-h-screen bg-[#f7f7f5] pt-2">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-          <div className="w-10 h-10 border-3 border-gray-200 border-t-black rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-[13px] text-gray-500">Loading products...</p>
-        </div>
-      </div>
-    );
+    return <Loader fullPage size="lg" text="Loading products..." />;
   }
 
-  // ============ ERROR ============
+ 
   if (error) {
     return (
       <div className="min-h-screen bg-[#f7f7f5] pt-2">
@@ -121,7 +118,7 @@ export default function AllProducts() {
 
   return (
     <div className="min-h-screen bg-[#f7f7f5] pt-2 pb-16">
-      {/* ================= HERO HEADER ================= */}
+     
       <div className="bg-[#f7f7f5] border-b border-gray-100">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-10">
           <div className="flex items-center gap-3 mb-4">
@@ -154,7 +151,7 @@ export default function AllProducts() {
         </div>
       </div>
 
-      {/* ================= TOOLBAR ================= */}
+     
       <ProductsToolbar
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -168,10 +165,10 @@ export default function AllProducts() {
         onClearFilters={clearAllFilters}
       />
 
-      {/* ================= MAIN CONTENT ================= */}
+     
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-8">
         {filtered.length === 0 ? (
-          /* ============ EMPTY STATE ============ */
+         
           <div className="bg-white rounded-3xl border border-gray-100 py-20 px-6 text-center">
             <div className="w-20 h-20 rounded-3xl bg-gray-100 flex items-center justify-center mx-auto mb-5">
               <FiSearch size={30} className="text-gray-400" />
@@ -198,7 +195,7 @@ export default function AllProducts() {
             )}
           </div>
         ) : (
-          /* ============ GRID VIEW ============ */
+         
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {filtered.map((product) => (
               <ProductCard key={product._id} product={product} />
@@ -206,7 +203,7 @@ export default function AllProducts() {
           </div>
         )}
 
-        {/* Results count */}
+    
         {filtered.length > 0 && (
           <div className="mt-10 text-center text-[12px] text-gray-400 tracking-wider uppercase">
             Showing {filtered.length} of {products.length} products

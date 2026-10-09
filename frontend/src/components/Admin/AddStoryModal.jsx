@@ -11,6 +11,8 @@ import {
 import { useAppDispatch } from "../../store/hooks";
 import { createStory, updateStory } from "../../store/slices/storySlice";
 import Field from "./Field";
+import Loader from "../common/Loader";
+import { toastError, toastSuccess, getErrMsg } from "../../utils/toast";
 
 export default function AddStoryModal({ isOpen, onClose, editingStory }) {
   const dispatch = useAppDispatch();
@@ -90,10 +92,12 @@ export default function AddStoryModal({ isOpen, onClose, editingStory }) {
 
     if (!file.type.startsWith("image/")) {
       setErrors((p) => ({ ...p, image: "Only image files allowed" }));
+      toastError("Only image files are allowed");
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
       setErrors((p) => ({ ...p, image: "Image must be under 5MB" }));
+      toastError("Image must be under 5MB");
       return;
     }
 
@@ -126,6 +130,7 @@ export default function AddStoryModal({ isOpen, onClose, editingStory }) {
     const errs = validate();
     if (Object.keys(errs).length) {
       setErrors(errs);
+      toastError("Please fix the errors first");
       return;
     }
 
@@ -141,13 +146,17 @@ export default function AddStoryModal({ isOpen, onClose, editingStory }) {
       fd.append("status", form.status);
 
       if (isEdit) {
-        await dispatch(updateStory({ id: editingStory._id, formData: fd })).unwrap();
+        await dispatch(
+          updateStory({ id: editingStory._id, formData: fd })
+        ).unwrap();
+        toastSuccess("Story updated successfully");
       } else {
         await dispatch(createStory({ formData: fd })).unwrap();
+        toastSuccess("Story published successfully");
       }
       onClose();
     } catch (err) {
-      alert(typeof err === "string" ? err : "Failed to save story");
+      toastError(getErrMsg(err, "Failed to save story"));
     } finally {
       setSubmitting(false);
     }
@@ -187,7 +196,7 @@ export default function AddStoryModal({ isOpen, onClose, editingStory }) {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-3.5">
-            {/* Image */}
+          
             <div>
               <label className="block text-[11px] font-bold uppercase tracking-[0.1em] text-gray-500 mb-1.5">
                 Cover Image {!isEdit && "*"}
@@ -266,13 +275,14 @@ export default function AddStoryModal({ isOpen, onClose, editingStory }) {
                     </div>
                   </label>
                   {errors.image && (
-                    <p className="text-[10.5px] text-red-500 mt-1">{errors.image}</p>
+                    <p className="text-[10.5px] text-red-500 mt-1">
+                      {errors.image}
+                    </p>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Title */}
             <Field
               label="Title *"
               name="title"
@@ -282,7 +292,6 @@ export default function AddStoryModal({ isOpen, onClose, editingStory }) {
               error={errors.title}
             />
 
-            {/* Category + Status */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Field
                 label="Category *"
@@ -308,7 +317,6 @@ export default function AddStoryModal({ isOpen, onClose, editingStory }) {
               </div>
             </div>
 
-            {/* Description */}
             <div>
               <label className="block text-[11px] font-bold uppercase tracking-[0.1em] text-gray-500 mb-1.5">
                 Short Description *
@@ -332,7 +340,6 @@ export default function AddStoryModal({ isOpen, onClose, editingStory }) {
               )}
             </div>
 
-            {/* Content */}
             <div>
               <label className="block text-[11px] font-bold uppercase tracking-[0.1em] text-gray-500 mb-1.5">
                 Full Content
@@ -347,7 +354,6 @@ export default function AddStoryModal({ isOpen, onClose, editingStory }) {
               />
             </div>
 
-            {/* Featured */}
             <label className="flex items-center gap-3 px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 cursor-pointer hover:border-gray-300 transition-all">
               <input
                 type="checkbox"
@@ -366,7 +372,6 @@ export default function AddStoryModal({ isOpen, onClose, editingStory }) {
               </div>
             </label>
 
-            {/* Actions */}
             <div className="flex items-center gap-2 pt-3 mt-1 border-t border-gray-100">
               <button
                 type="button"
@@ -383,7 +388,7 @@ export default function AddStoryModal({ isOpen, onClose, editingStory }) {
               >
                 {submitting ? (
                   <>
-                    <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <Loader inline size="xs" color="white" />
                     {isEdit ? "Updating..." : "Publishing..."}
                   </>
                 ) : (

@@ -5,7 +5,7 @@ const productSchema = new mongoose.Schema(
     name: { type: String, trim: true, default: "N/A" },
     tagline: { type: String, trim: true, default: "N/A" },
     image: { type: String, required: true, trim: true },
-    imagePublicId: { type: String, default: "" }, // ⭐ Cloudinary public_id
+    imagePublicId: { type: String, default: "" }, 
     topSpeed: { type: String, trim: true, default: "N/A" },
     range: { type: String, trim: true, default: "N/A" },
     battery: { type: String, trim: true, default: "N/A" },

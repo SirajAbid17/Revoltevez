@@ -14,6 +14,7 @@ import {
   submitFeedback,
   resetSubmitState,
 } from "../../store/slices/feedbackSlice";
+import Loader from "../common/Loader";
 
 export default function FeedbackForm({ user }) {
   const dispatch = useAppDispatch();
@@ -31,7 +32,7 @@ export default function FeedbackForm({ user }) {
   const [hoverRating, setHoverRating] = useState(0);
   const [touched, setTouched] = useState({});
 
-  // Prefill from Clerk user
+ 
   useEffect(() => {
     if (user) {
       setForm((p) => ({
@@ -42,7 +43,7 @@ export default function FeedbackForm({ user }) {
     }
   }, [user]);
 
-  // Reset success after 5s
+ 
   useEffect(() => {
     if (submitSuccess) {
       setForm((p) => ({ ...p, rating: 5, message: "" }));
@@ -82,7 +83,7 @@ export default function FeedbackForm({ user }) {
   return (
     <div className="min-h-screen bg-[#f7f7f5] flex items-center justify-center px-4 py-6">
       <div className="w-full max-w-[420px]">
-        {/* HEADER */}
+       
         <div className="text-center mb-5">
           <div className="flex items-center justify-center gap-2 mb-2">
             <span className="w-6 h-px bg-black" />
@@ -102,9 +103,9 @@ export default function FeedbackForm({ user }) {
           </p>
         </div>
 
-        {/* FORM CARD */}
+        
         <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-5 shadow-[0_15px_40px_rgba(0,0,0,0.05)]">
-          {/* Locked User Info — compact */}
+         
           <div className="mb-4 flex items-center gap-2.5 p-2.5 rounded-xl bg-gray-50 border border-gray-100">
             {user.photoURL ? (
               <img
@@ -136,7 +137,7 @@ export default function FeedbackForm({ user }) {
             </span>
           </div>
 
-          {/* Success Banner */}
+          
           {submitSuccess && (
             <div className="mb-3 flex items-start gap-2 bg-green-50 border border-green-100 rounded-lg p-2.5 animate-[slideDown_0.3s_ease]">
               <FiCheckCircle
@@ -149,7 +150,7 @@ export default function FeedbackForm({ user }) {
             </div>
           )}
 
-          {/* Error Banner */}
+         
           {submitError && (
             <div className="mb-3 flex items-start gap-2 bg-red-50 border border-red-100 rounded-lg p-2.5">
               <FiAlertCircle
@@ -161,9 +162,9 @@ export default function FeedbackForm({ user }) {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-3.5">
-            {/* Name + Email grid */}
+            
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {/* Locked Name */}
+              
               <div>
                 <label className="block text-[9.5px] font-bold uppercase tracking-[0.1em] text-gray-500 mb-1.5">
                   Name
@@ -187,7 +188,7 @@ export default function FeedbackForm({ user }) {
                 </div>
               </div>
 
-              {/* Locked Email */}
+             
               <div>
                 <label className="block text-[9.5px] font-bold uppercase tracking-[0.1em] text-gray-500 mb-1.5">
                   Email
@@ -212,7 +213,7 @@ export default function FeedbackForm({ user }) {
               </div>
             </div>
 
-            {/* Role */}
+           
             <div>
               <label className="block text-[9.5px] font-bold uppercase tracking-[0.1em] text-gray-500 mb-1.5">
                 Role
@@ -231,7 +232,7 @@ export default function FeedbackForm({ user }) {
               />
             </div>
 
-            {/* Rating — compact */}
+            
             <div>
               <label className="block text-[9.5px] font-bold uppercase tracking-[0.1em] text-gray-500 mb-1.5">
                 Rating *
@@ -269,7 +270,7 @@ export default function FeedbackForm({ user }) {
               </div>
             </div>
 
-            {/* Message — smaller rows */}
+            
             <div>
               <label className="block text-[9.5px] font-bold uppercase tracking-[0.1em] text-gray-500 mb-1.5">
                 Feedback *
@@ -292,7 +293,7 @@ export default function FeedbackForm({ user }) {
               </p>
             </div>
 
-            {/* Submit */}
+            
             <button
               type="submit"
               disabled={submitting}
@@ -300,7 +301,7 @@ export default function FeedbackForm({ user }) {
             >
               {submitting ? (
                 <>
-                  <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <Loader inline size="xs" color="white" />
                   Submitting...
                 </>
               ) : (

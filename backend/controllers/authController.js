@@ -4,25 +4,26 @@ const { getCookieOptions } = require("../utils/cookieOptions");
 
 const COOKIE_NAME = process.env.COOKIE_NAME || "revoltevez_token";
 
-/**
- * POST /api/auth/session
- * Frontend Clerk login ke baad yahan call karega.
- * Clerk token verify hoga (via authenticate middleware) → JWT cookie set hoga.
- */
 exports.createSession = async (req, res) => {
   try {
-    // req.dbUser authenticate middleware se aata hai
     const user = req.dbUser;
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        error: "No user resolved from Clerk session",
+      });
+    }
 
     const token = generateToken(user._id);
 
-    // HTTP-only cookie me JWT set karo
+    
     res.cookie(COOKIE_NAME, token, getCookieOptions());
 
     res.json({
       success: true,
       message: "Session created",
-      token, // optional — mobile apps ke liye
+      token,
       user,
     });
   } catch (err) {
@@ -31,14 +32,15 @@ exports.createSession = async (req, res) => {
   }
 };
 
-/**
- * POST /api/auth/logout
- * Cookie clear karta hai
- */
 exports.logout = (req, res) => {
+  const options = getCookieOptions();
+
+ 
   res.clearCookie(COOKIE_NAME, {
-    ...getCookieOptions(),
-    maxAge: 0,
+    httpOnly: options.httpOnly,
+    secure: options.secure,
+    sameSite: options.sameSite,
+    path: options.path,
   });
 
   res.json({
@@ -47,10 +49,7 @@ exports.logout = (req, res) => {
   });
 };
 
-/**
- * GET /api/auth/me
- * Returns current user (works with JWT cookie OR Clerk token)
- */
+
 exports.getSession = (req, res) => {
   res.json({
     success: true,
@@ -59,10 +58,7 @@ exports.getSession = (req, res) => {
   });
 };
 
-/**
- * POST /api/auth/refresh
- * JWT cookie refresh karta hai (agar valid hai)
- */
+
 exports.refreshSession = async (req, res) => {
   try {
     const user = req.dbUser;

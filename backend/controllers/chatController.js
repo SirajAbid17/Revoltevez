@@ -1,21 +1,23 @@
-const { ChatGroq } = require("@langchain/groq");
-const { HumanMessage, SystemMessage, AIMessage, ToolMessage } = require("@langchain/core/messages");
-const tools = require("../services/chatTools");
+const {
+  HumanMessage,
+  AIMessage,
+} = require("@langchain/core/messages");
 
-// ============ LLM INSTANCE ============
-const llm = new ChatGroq({
-  model: "openai/gpt-oss-120b", // free & powerful
-  temperature: 0.3,
-  maxTokens: 1024,
-  apiKey: process.env.GROQ_API_KEY,
-  streaming: false,
-});
+const groqChat = require("../services/groqChat");
+const rotator = require("../services/groqRotator");
 
-// Bind tools so LLM can call them
-const llmWithTools = llm.bindTools(tools);
 
-// Map for quick tool lookup
-const toolMap = Object.fromEntries(tools.map((t) => [t.name, t]));
+const FALLBACK_REPLY = `I'm having a little trouble thinking right now. 🛠️
+
+Please try again in a moment — or reach out to our team directly, they'll help you right away!
+
+We're here for you Mon–Sat, 9:00 AM – 7:00 PM.`;
+
+const WHATSAPP_NUMBER = "923406500029";
+const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+  "Hi Revoltevez! I need help with the AI assistant."
+)}`;
+
 
 const SYSTEM_PROMPT = `You are Revoltevez AI Assistant — helpful, friendly assistant for Revoltevez (Private) Limited, an electric vehicle company based in Lahore, Pakistan.
 
@@ -53,7 +55,7 @@ Help customers with products, prices, specs, company info, and general questions
 2. Use bullet lists for specs
 3. Short paragraphs (2-3 lines)
 4. Blank line between sections
-5. Emojis sparingly: 📞 📍 ⚡ 💰
+
 
 ### ❌ DON'T:
 1. Never use markdown tables
@@ -67,10 +69,6 @@ Help customers with products, prices, specs, company info, and general questions
 - Top speed: 60 km/h
 - Range: 110 km
 - Battery: 72V 35Ah
-
-**REVOO X20** — 189,000 PKR
-- Top speed: 45 km/h
-- Range: 80 km
 
 ### Company Info Format:
 - 📞 Phone: **0340 650 0029**
@@ -93,130 +91,143 @@ Help customers with products, prices, specs, company info, and general questions
 - Address: Al Ghani Industrial Area, Iqbal Chowk, Gajumata, Lahore
 - Hours: Mon–Sat, 9:00 AM – 7:00 PM`;
 
-// ============ IN-MEMORY SESSION STORE ============
-// Production mein isko Redis ya MongoDB mein store karein
-const sessions = new Map();
-const MAX_HISTORY = 10; // last 10 messages per session
 
-function getHistory(sessionId) {
-  if (!sessions.has(sessionId)) {
-    sessions.set(sessionId, []);
+const sessions = new Map();
+const MAX_HISTORY = 10;
+
+function getHistory(key) {
+  if (!sessions.has(key)) {
+    sessions.set(key, []);
   }
-  return sessions.get(sessionId);
+  return sessions.get(key);
 }
 
-function pushHistory(sessionId, message) {
-  const history = getHistory(sessionId);
+function pushHistory(key, message) {
+  const history = getHistory(key);
   history.push(message);
   if (history.length > MAX_HISTORY * 2) {
     history.splice(0, history.length - MAX_HISTORY * 2);
   }
 }
 
-// ============ MAIN CHAT HANDLER ============
+
 exports.handleChat = async (req, res) => {
   try {
+   
+    if (!req.dbUser) {
+      return res.status(401).json({
+        success: false,
+        error: "Please sign in to use the AI assistant.",
+      });
+    }
+
+    const userId = req.dbUser._id.toString();
     const { message, sessionId = "default" } = req.body;
 
     if (!message || !message.trim()) {
-      return res.status(400).json({ success: false, error: "Message is required" });
+      return res.status(400).json({
+        success: false,
+        error: "Message is required",
+      });
     }
 
-    // Build message chain
-    const history = getHistory(sessionId);
-    const messages = [
-      new SystemMessage(SYSTEM_PROMPT),
-      ...history,
-      new HumanMessage(message.trim()),
-    ];
+    const sessionKey = `${userId}::${sessionId}`;
+    const history = getHistory(sessionKey);
 
-    // ============ AGENT LOOP (max 5 iterations) ============
-    let finalAnswer = "";
-    let iterations = 0;
-    const MAX_ITERATIONS = 5;
+    
+    const finalAnswer = await groqChat.runAgentWithRotation({
+      systemPrompt: SYSTEM_PROMPT,
+      history,
+      userMessage: message.trim(),
+    });
 
-    while (iterations < MAX_ITERATIONS) {
-      iterations++;
+    
+    pushHistory(sessionKey, new HumanMessage(message.trim()));
+    pushHistory(sessionKey, new AIMessage(finalAnswer));
 
-      const response = await llmWithTools.invoke(messages);
-      messages.push(response);
-
-      // Check if LLM wants to call tools
-      if (response.tool_calls && response.tool_calls.length > 0) {
-        // Execute each tool call
-        for (const toolCall of response.tool_calls) {
-          const tool = toolMap[toolCall.name];
-
-          if (!tool) {
-            messages.push(
-              new ToolMessage({
-                tool_call_id: toolCall.id,
-                content: JSON.stringify({ error: `Unknown tool: ${toolCall.name}` }),
-              })
-            );
-            continue;
-          }
-
-          try {
-            const result = await tool.invoke(toolCall.args);
-            messages.push(
-              new ToolMessage({
-                tool_call_id: toolCall.id,
-                content: typeof result === "string" ? result : JSON.stringify(result),
-              })
-            );
-          } catch (toolErr) {
-            console.error(`Tool ${toolCall.name} failed:`, toolErr);
-            messages.push(
-              new ToolMessage({
-                tool_call_id: toolCall.id,
-                content: JSON.stringify({ error: "Tool execution failed" }),
-              })
-            );
-          }
-        }
-        // Loop again so LLM can process tool results
-        continue;
-      }
-
-      // No tool calls — this is the final answer
-      finalAnswer = response.content || "I'm sorry, I couldn't generate a response.";
-      break;
-    }
-
-    if (!finalAnswer) {
-      finalAnswer = "I'm sorry, I couldn't complete your request. Please try again.";
-    }
-
-    // Save to history
-    pushHistory(sessionId, new HumanMessage(message.trim()));
-    pushHistory(sessionId, new AIMessage(finalAnswer));
-
-    res.json({
+    return res.json({
       success: true,
       reply: finalAnswer,
       sessionId,
+      fallback: false,
     });
   } catch (err) {
     console.error("Chat error:", err);
 
-    if (err?.message?.includes("rate limit") || err?.status === 429) {
-      return res.status(429).json({
-        success: false,
-        error: "I'm a bit busy right now. Please try again in a few seconds.",
+   
+    if (err?.code === "ALL_KEYS_EXHAUSTED") {
+      return res.status(200).json({
+        success: true,
+        reply: FALLBACK_REPLY,
+        fallback: true,
+        whatsapp: WHATSAPP_LINK,
+        whatsappNumber: WHATSAPP_NUMBER,
+        sessionId: req.body?.sessionId || "default",
       });
     }
 
-    res.status(500).json({
-      success: false,
-      error: "Something went wrong. Please try again.",
+    
+    if (groqChat.isRateLimitError(err)) {
+      return res.status(200).json({
+        success: true,
+        reply: FALLBACK_REPLY,
+        fallback: true,
+        whatsapp: WHATSAPP_LINK,
+        whatsappNumber: WHATSAPP_NUMBER,
+        sessionId: req.body?.sessionId || "default",
+      });
+    }
+
+   
+    return res.status(200).json({
+      success: true,
+      reply: FALLBACK_REPLY,
+      fallback: true,
+      whatsapp: WHATSAPP_LINK,
+      whatsappNumber: WHATSAPP_NUMBER,
+      sessionId: req.body?.sessionId || "default",
     });
   }
 };
 
-// ============ CLEAR SESSION ============
+
 exports.clearSession = async (req, res) => {
+  if (!req.dbUser) {
+    return res.status(401).json({
+      success: false,
+      error: "Please sign in.",
+    });
+  }
+
+  const userId = req.dbUser._id.toString();
   const { sessionId } = req.params;
-  sessions.delete(sessionId);
+
+  sessions.delete(`${userId}::${sessionId}`);
+
   res.json({ success: true, message: "Session cleared" });
+};
+
+
+exports.getKeysStats = async (req, res) => {
+  try {
+    if (!req.dbUser || req.dbUser.role !== "admin") {
+      return res.status(403).json({ success: false, error: "Admin only" });
+    }
+    res.json({ success: true, stats: rotator.stats() });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+
+exports.resetKeys = async (req, res) => {
+  try {
+    if (!req.dbUser || req.dbUser.role !== "admin") {
+      return res.status(403).json({ success: false, error: "Admin only" });
+    }
+    rotator.resetAll();
+    res.json({ success: true, message: "All Groq keys reset" });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
 };

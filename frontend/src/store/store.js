@@ -2,9 +2,11 @@ import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./slices/authSlice";
 import productsReducer from "./slices/productsSlice";
 import usersReducer from "./slices/usersSlice";
-import feedbackReducer from "./slices/feedbackSlice"; // ← NEW
+import feedbackReducer from "./slices/feedbackSlice"; 
 import storyReducer from "./slices/storySlice";
 import chatReducer from "./slices/chatSlice";
+import bookingReducer from "./slices/bookingSlice";
+
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -13,6 +15,7 @@ export const store = configureStore({
     feedback: feedbackReducer, 
      stories: storyReducer,
       chat: chatReducer,
+       booking: bookingReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

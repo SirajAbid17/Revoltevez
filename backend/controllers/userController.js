@@ -1,8 +1,5 @@
 const User = require("../models/User");
 
-/**
- * GET /api/user/me
- */
 exports.getMe = (req, res) => {
   res.json({
     success: true,
@@ -11,9 +8,7 @@ exports.getMe = (req, res) => {
   });
 };
 
-/**
- * PUT /api/user/me
- */
+
 exports.updateMe = async (req, res, next) => {
   try {
     const allowed = ["name", "phone", "address", "city"];
@@ -34,9 +29,7 @@ exports.updateMe = async (req, res, next) => {
   }
 };
 
-/**
- * DELETE /api/user/me
- */
+
 exports.deleteMe = async (req, res, next) => {
   try {
     await req.dbUser.deleteOne();
@@ -48,9 +41,7 @@ exports.deleteMe = async (req, res, next) => {
   }
 };
 
-/**
- * GET /api/user/dashboard
- */
+
 exports.getDashboard = (req, res) => {
   res.json({
     success: true,
@@ -59,9 +50,7 @@ exports.getDashboard = (req, res) => {
   });
 };
 
-/**
- * GET /api/user/all (admin only)
- */
+
 exports.getAllUsers = async (req, res, next) => {
   try {
     const users = await User.find().sort({ createdAt: -1 });
@@ -76,9 +65,7 @@ exports.getAllUsers = async (req, res, next) => {
   }
 };
 
-/**
- * GET /api/user/admin/stats (admin only)
- */
+
 exports.getAdminStats = async (req, res, next) => {
   try {
     const [total, admins, google, email] = await Promise.all([
@@ -103,9 +90,7 @@ exports.getAdminStats = async (req, res, next) => {
   }
 };
 
-/**
- * PUT /api/user/:userId/role (admin only)
- */
+
 exports.updateUserRole = async (req, res, next) => {
   try {
     const { role } = req.body;
@@ -136,9 +121,7 @@ exports.updateUserRole = async (req, res, next) => {
   }
 };
 
-/**
- * DELETE /api/user/:userId (admin only)
- */
+
 exports.deleteUserById = async (req, res, next) => {
   try {
     const user = await User.findByIdAndDelete(req.params.userId);

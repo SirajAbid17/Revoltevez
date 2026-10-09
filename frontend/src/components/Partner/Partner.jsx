@@ -52,7 +52,7 @@ export default function Partner() {
   return (
     <section className="w-full overflow-hidden bg-[#f7f7f5] px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
       <div className="mx-auto max-w-[1200px] 2xl:max-w-[1320px]">
-        {/* ================= HEADER ================= */}
+     
         <div className="mb-8 flex flex-col justify-between gap-5 sm:mb-11 lg:flex-row lg:items-end">
           <div className="min-w-0">
             <div className="mb-3 flex items-center gap-3">
@@ -75,7 +75,7 @@ export default function Partner() {
           </p>
         </div>
 
-        {/* ================= CARDS ================= */}
+        
         <div className="grid grid-cols-1 place-items-center gap-5 sm:gap-6 lg:grid-cols-2">
           {cards.map((card) => (
             <article
@@ -126,7 +126,7 @@ export default function Partner() {
                 xl:h-[420px]
               "
             >
-              {/* ============ MOBILE / TABLET BACKGROUND IMAGE ============ */}
+              
               <div className="absolute inset-0 lg:hidden">
                 <img
                   src={card.image}
@@ -150,7 +150,7 @@ export default function Partner() {
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.08),transparent_60%)]" />
               </div>
 
-              {/* ============ DESKTOP SIDE IMAGE ============ */}
+            
               <div
                 className="
                   absolute
@@ -205,7 +205,7 @@ export default function Partner() {
                 />
               </div>
 
-              {/* ================= AMBIENT GLOW ================= */}
+             
               <div
                 className="
                   pointer-events-none
@@ -228,7 +228,7 @@ export default function Partner() {
                 "
               />
 
-              {/* ================= GRAIN ================= */}
+             
               <div
                 className="
                   pointer-events-none
@@ -242,7 +242,7 @@ export default function Partner() {
                 "
               />
 
-              {/* ================= CONTENT ================= */}
+             
               <div
                 className="
                   relative
@@ -258,7 +258,7 @@ export default function Partner() {
                   lg:p-7
                 "
               >
-                {/* TOP ROW */}
+               
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-[10px] font-bold tracking-[0.35em] text-white/45">
                     {card.number}
@@ -270,7 +270,7 @@ export default function Partner() {
                   </div>
                 </div>
 
-                {/* CENTER BLOCK */}
+                
                 <div className="min-w-0 lg:my-auto">
                   <div
                     className="
@@ -335,7 +335,6 @@ export default function Partner() {
                     {card.description}
                   </p>
 
-                  {/* CTA BUTTON */}
                   <button
                     type="button"
                     onClick={(e) => {
@@ -397,7 +396,7 @@ export default function Partner() {
                   </button>
                 </div>
 
-                {/* BOTTOM ROW */}
+                
                 <div className="flex items-center gap-2.5 text-white/40">
                   {card.type === "ride" ? (
                     <>
@@ -417,7 +416,7 @@ export default function Partner() {
                 </div>
               </div>
 
-              {/* ================= FLOATING ARROW ================= */}
+            
               <div
                 className="
                   pointer-events-none
@@ -451,7 +450,7 @@ export default function Partner() {
                 <FiArrowUpRight className="transition-transform duration-500 group-hover:rotate-45 motion-reduce:transition-none" />
               </div>
 
-              {/* ================= PROGRESS BAR ================= */}
+             
               <div className="pointer-events-none absolute bottom-3 left-5 right-5 z-20">
                 <div className="h-px overflow-hidden bg-white/10">
                   <div
@@ -474,7 +473,6 @@ export default function Partner() {
           ))}
         </div>
 
-        {/* ================= FOOTER ================= */}
         <div className="mt-8 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
           <div className="flex items-center gap-3">
             <span className="h-1.5 w-1.5 rounded-full bg-black" />

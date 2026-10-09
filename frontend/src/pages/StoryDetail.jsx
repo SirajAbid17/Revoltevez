@@ -1,8 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { FiArrowLeft, FiCalendar, FiTag, FiEye } from "react-icons/fi";
+import { FiArrowLeft, FiBookmark } from "react-icons/fi";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { fetchStoryById, clearCurrent } from "../store/slices/storySlice";
+import Loader from "../components/common/Loader";
+import StoryHero from "../components/Stories/StoryHero";
+import StoryBody from "../components/Stories/StoryBody";
+
 
 export default function StoryDetail() {
   const { id } = useParams();
@@ -10,6 +14,12 @@ export default function StoryDetail() {
   const dispatch = useAppDispatch();
   const { current, currentLoading } = useAppSelector((s) => s.stories);
 
+  const [descExpanded, setDescExpanded] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const contentRef = useRef(null);
+
+ 
   useEffect(() => {
     if (id) dispatch(fetchStoryById(id));
     return () => {
@@ -17,104 +27,98 @@ export default function StoryDetail() {
     };
   }, [id, dispatch]);
 
+ 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [id]);
+
+
+  useEffect(() => {
+    const onScroll = () => {
+      const el = contentRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const total = el.scrollHeight - window.innerHeight;
+      const scrolled = Math.min(
+        Math.max(-rect.top, 0),
+        Math.max(total, 1)
+      );
+      setProgress(Math.round((scrolled / Math.max(total, 1)) * 100));
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [current]);
+
+ 
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      
+    }
+  };
+
+  
   if (currentLoading) {
-    return (
-      <div className="py-32 text-center">
-        <div className="w-10 h-10 border-3 border-gray-200 border-t-black rounded-full animate-spin mx-auto" />
-      </div>
-    );
+    return <Loader fullPage size="lg" text="Loading story..." />;
   }
 
+  
   if (!current) {
     return (
-      <div className="py-32 text-center px-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-3">Story not found</h1>
-        <button
-          onClick={() => navigate("/stories")}
-          className="text-sm font-semibold text-gray-600 hover:text-black underline"
-        >
-          ← Back to all stories
-        </button>
+      <div className="min-h-screen flex items-center justify-center bg-[#f7f7f5] px-5">
+        <div className="text-center max-w-md">
+          <div className="w-16 h-16 rounded-2xl bg-white border border-gray-200 flex items-center justify-center mx-auto mb-5 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)]">
+            <FiBookmark size={26} className="text-gray-400" />
+          </div>
+          <h1 className="text-[22px] font-bold text-[#111] mb-2">
+            Story not found
+          </h1>
+          <p className="text-[13.5px] text-gray-500 mb-6">
+            The story you're looking for doesn't exist or has been removed.
+          </p>
+          <button
+            onClick={() => navigate("/stories")}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-black text-white text-[13px] font-semibold hover:bg-gray-800 transition-all"
+          >
+            <FiArrowLeft size={14} />
+            Back to Stories
+          </button>
+        </div>
       </div>
     );
   }
 
-  const date = new Date(current.date).toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-
+  
   return (
-    <article className="w-full bg-white">
-      {/* Hero */}
-      <div className="relative w-full h-[55vh] min-h-[340px] max-h-[560px] overflow-hidden bg-black">
-        <img
-          src={current.image}
-          alt={current.title}
-          className="absolute inset-0 w-full h-full object-cover opacity-85"
+    <article className="w-full bg-[#f7f7f5]" ref={contentRef}>
+    
+      <div className="fixed top-0 left-0 right-0 h-[2px] z-[60] bg-transparent">
+        <div
+          className="h-full bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-600 transition-all duration-150 ease-out"
+          style={{ width: `${progress}%` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/20" />
-
-        <button
-          onClick={() => navigate(-1)}
-          className="absolute top-6 left-5 sm:left-8 inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-semibold px-4 py-2 rounded-full hover:bg-white/20 transition-all"
-        >
-          <FiArrowLeft size={13} /> Back
-        </button>
-
-        <div className="absolute inset-x-0 bottom-0 px-5 sm:px-8 lg:px-12 pb-10">
-          <div className="max-w-4xl mx-auto text-white">
-            <div className="flex flex-wrap items-center gap-3 mb-4 text-[11px] font-semibold uppercase tracking-widest text-white/80">
-              <span className="inline-flex items-center gap-1.5">
-                <FiTag size={11} /> {current.category}
-              </span>
-              <span className="w-1 h-1 rounded-full bg-white/40" />
-              <span className="inline-flex items-center gap-1.5">
-                <FiCalendar size={11} /> {date}
-              </span>
-              <span className="w-1 h-1 rounded-full bg-white/40" />
-              <span className="inline-flex items-center gap-1.5">
-                <FiEye size={11} /> {current.views || 0}
-              </span>
-            </div>
-
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight tracking-tight">
-              {current.title}
-            </h1>
-          </div>
-        </div>
       </div>
 
-      {/* Body */}
-      <div className="max-w-3xl mx-auto px-5 sm:px-8 py-12">
-        <p className="text-lg sm:text-xl text-gray-700 leading-relaxed font-medium mb-10 border-l-4 border-black pl-5">
-          {current.description}
-        </p>
+    
+      <StoryHero
+        story={current}
+        onBack={() => navigate(-1)}
+        onCopy={handleCopyLink}
+        copied={copied}
+      />
 
-        {current.content ? (
-          <div className="text-gray-700 leading-8 whitespace-pre-line text-[15px] sm:text-base">
-            {current.content}
-          </div>
-        ) : (
-          <p className="text-gray-500 italic">Full story coming soon…</p>
-        )}
-
-        <div className="mt-14 pt-8 border-t border-gray-200 flex flex-wrap items-center justify-between gap-4">
-          <button
-            onClick={() => navigate("/stories")}
-            className="text-sm font-semibold text-gray-700 hover:text-black transition-colors"
-          >
-            ← View all stories
-          </button>
-          <button
-            onClick={() => navigate("/")}
-            className="text-sm font-semibold text-gray-700 hover:text-black transition-colors"
-          >
-            Home →
-          </button>
-        </div>
-      </div>
+      
+      <StoryBody
+        story={current}
+        descExpanded={descExpanded}
+        onToggleDesc={() => setDescExpanded((v) => !v)}
+        onViewAll={() => navigate("/stories")}
+        onBackHome={() => navigate("/")}
+      />
     </article>
   );
 }

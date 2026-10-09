@@ -34,14 +34,14 @@ export default function ImagesSection() {
     setProgressKey((k) => k + 1);
   }, []);
 
-  // Auto-play
+
   useEffect(() => {
     if (isPaused) return;
     const interval = setInterval(next, SLIDE_DURATION);
     return () => clearInterval(interval);
   }, [isPaused, next]);
 
-  // Keyboard nav
+
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === "ArrowRight") next();
@@ -51,7 +51,7 @@ export default function ImagesSection() {
     return () => window.removeEventListener("keydown", onKey);
   }, [next, prev]);
 
-  // Touch swipe
+ 
   const onTouchStart = (e) => {
     touchStartX.current = e.touches[0].clientX;
     setIsPaused(true);
@@ -94,7 +94,7 @@ export default function ImagesSection() {
       "
       aria-roledescription="carousel"
     >
-      {/* SLIDES */}
+     
       {images.map((slide, index) => {
         const isActive = index === current;
         const hasError = imgErrors[index];
@@ -133,12 +133,12 @@ export default function ImagesSection() {
               </div>
             )}
 
-            {/* Overlays — lighter on mobile so image shows through */}
+           
             <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/70 sm:from-black/40 sm:via-black/10 sm:to-black/70" />
             <div className="absolute inset-0 hidden sm:block bg-gradient-to-r from-black/50 via-transparent to-black/30" />
             <div className="absolute bottom-0 left-0 w-full h-40 sm:h-56 lg:h-64 bg-gradient-to-t from-black/80 to-transparent" />
 
-            {/* TEXT */}
+           
             <div className="absolute inset-0 z-20 flex items-end">
               <div className="w-full max-w-[1360px] mx-auto px-5 sm:px-8 lg:px-12 pb-20 sm:pb-28 lg:pb-32">
                 <div className="max-w-2xl">
@@ -207,7 +207,7 @@ export default function ImagesSection() {
         );
       })}
 
-      {/* BOTTOM CONTROLS */}
+     
       <div className="absolute bottom-0 left-0 right-0 z-30">
         <div className="max-w-[1360px] mx-auto px-5 sm:px-8 lg:px-12 pb-5 sm:pb-6 lg:pb-8">
           <div className="flex items-center justify-between gap-4">

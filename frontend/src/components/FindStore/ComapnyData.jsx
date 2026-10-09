@@ -12,7 +12,7 @@ import {
 } from "react-icons/fi";
 
 export default function ComapnyData() {
-  // ============ COMPANY INFO ============
+  
   const companyInfo = [
     {
       icon: <FiPhone size={16} />,
@@ -37,7 +37,7 @@ export default function ComapnyData() {
     },
   ];
 
-  // ============ LEGAL INFO ============
+  
   const legalInfo = [
     {
       icon: <FiAward size={14} />,
@@ -59,7 +59,7 @@ export default function ComapnyData() {
   return (
     <div className="min-h-screen bg-[#f7f7f5] pt-0 pb-8 sm:pb-10 px-5 sm:px-8 lg:px-12 ">
       <div className="max-w-[1000px] mx-auto">
-        {/* ================= HEADER ================= */}
+       
         <div className="text-center mb-6">
           <div className="inline-flex items-center gap-2 mb-3 px-3.5 py-1.5 rounded-full bg-gray-50 border border-gray-100 mt-5">
             <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse" />
@@ -78,7 +78,7 @@ export default function ComapnyData() {
           </p>
         </div>
 
-        {/* ================= CONTACT CARDS ================= */}
+       
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
           {companyInfo.map((info, i) => (
             <a
@@ -99,19 +99,19 @@ export default function ComapnyData() {
                 transition-all duration-400
               "
             >
-              {/* Icon */}
+              
               <div
                 className={`w-10 h-10 rounded-xl bg-gradient-to-br ${info.color} text-white flex items-center justify-center mb-3 shadow-sm group-hover:scale-105 transition-transform duration-300`}
               >
                 {info.icon}
               </div>
 
-              {/* Label */}
+             
               <p className="text-[9.5px] font-bold tracking-[0.14em] text-gray-400 uppercase mb-1">
                 {info.label}
               </p>
 
-              {/* Value */}
+          
               <div className="flex items-center justify-between gap-2">
                 <p className="text-[12.5px] font-semibold text-[#111] truncate">
                   {info.value}
@@ -125,10 +125,10 @@ export default function ComapnyData() {
           ))}
         </div>
 
-        {/* ================= LOCATION CARD ================= */}
+       
         <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:border-gray-200 hover:shadow-[0_15px_40px_rgba(0,0,0,0.06)] transition-all duration-400">
           <div className="grid grid-cols-1 md:grid-cols-2">
-            {/* LEFT — Info */}
+           
             <div className="p-6 sm:p-7 flex flex-col justify-center">
               <div className="flex items-center gap-2 mb-3">
                 <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse" />
@@ -141,7 +141,7 @@ export default function ComapnyData() {
                 Visit Our Factory
               </h2>
 
-              {/* Address */}
+             
               <div className="flex items-start gap-3 mb-4">
                 <div className="w-9 h-9 rounded-lg bg-black text-white flex items-center justify-center shrink-0">
                   <FiMapPin size={14} />
@@ -160,7 +160,7 @@ export default function ComapnyData() {
                 </div>
               </div>
 
-              {/* Hours */}
+              
               <div className="flex items-start gap-3 mb-4">
                 <div className="w-9 h-9 rounded-lg bg-gray-100 text-gray-700 flex items-center justify-center shrink-0">
                   <FiClock size={14} />
@@ -175,7 +175,7 @@ export default function ComapnyData() {
                 </div>
               </div>
 
-              {/* Directions button */}
+             
               <a
                 href="https://maps.google.com/?q=Al+Ghani+Industrial+Area+Iqbal+Chowk+Gajumata+Lahore+Pakistan"
                 target="_blank"
@@ -198,7 +198,7 @@ export default function ComapnyData() {
               </a>
             </div>
 
-            {/* RIGHT — Map */}
+          
             <div className="relative min-h-[280px] md:min-h-full bg-gray-100">
               <iframe
                 title="Revoltevez Location"
@@ -211,7 +211,7 @@ export default function ComapnyData() {
           </div>
         </div>
 
-        {/* ================= LEGAL INFO ================= */}
+        
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
           {legalInfo.map((item, i) => (
             <div

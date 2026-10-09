@@ -1,10 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../../config/api";
 
-// ============================================
-// ASYNC THUNKS
-// ============================================
-
 export const syncSession = createAsyncThunk(
   "auth/syncSession",
   async (clerkToken, { rejectWithValue }) => {
@@ -59,9 +55,6 @@ export const updateProfile = createAsyncThunk(
   }
 );
 
-// ============================================
-// INITIAL STATE
-// ============================================
 
 const initialState = {
   user: null,
@@ -88,7 +81,7 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // ----- SYNC SESSION -----
+    
       .addCase(syncSession.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -104,7 +97,7 @@ const authSlice = createSlice({
         state.error = action.payload;
       })
 
-      // ----- FETCH ME -----
+      
       .addCase(fetchMe.pending, (state) => {
         state.loading = true;
       })
@@ -121,9 +114,9 @@ const authSlice = createSlice({
         state.synced = true;
       })
 
-      // ----- LOGOUT -----
+    
       .addCase(logoutUser.pending, (state) => {
-        // Immediate clear — UI responsive
+       
         state.user = null;
         state.isAuthenticated = false;
         state.synced = true;
@@ -136,7 +129,7 @@ const authSlice = createSlice({
         state.error = null;
       })
 
-      // ----- UPDATE PROFILE -----
+      
       .addCase(updateProfile.fulfilled, (state, action) => {
         state.user = action.payload;
       });

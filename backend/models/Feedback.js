@@ -8,7 +8,7 @@ const feedbackSchema = new mongoose.Schema(
       required: true,
       lowercase: true,
       trim: true,
-      unique: true, // ⭐ ONE EMAIL = ONE FEEDBACK
+      unique: true, 
       index: true,
     },
     role: { type: String, trim: true, default: "Verified Rider" },

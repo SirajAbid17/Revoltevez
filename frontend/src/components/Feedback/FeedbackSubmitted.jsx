@@ -6,6 +6,7 @@ import {
   FiLock,
   FiClock,
   FiXCircle,
+  FiArrowLeft,
 } from "react-icons/fi";
 
 export default function FeedbackSubmitted({ feedback, user }) {
@@ -46,7 +47,7 @@ export default function FeedbackSubmitted({ feedback, user }) {
   return (
     <div className="min-h-screen bg-[#f7f7f5] flex items-center justify-center px-4 py-20">
       <div className="w-full max-w-lg">
-        {/* Header */}
+       
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
             <span className="w-8 h-px bg-black" />
@@ -63,9 +64,8 @@ export default function FeedbackSubmitted({ feedback, user }) {
           </h1>
         </div>
 
-        {/* Status Card */}
         <div className="bg-white rounded-3xl border border-gray-100 p-6 sm:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.06)]">
-          {/* Status Banner */}
+         
           <div
             className={`flex items-start gap-3 p-4 rounded-2xl ${config.bg} ${config.border} border mb-6`}
           >
@@ -82,14 +82,14 @@ export default function FeedbackSubmitted({ feedback, user }) {
             </div>
           </div>
 
-          {/* Your Submission */}
+        
           <div className="pt-2">
             <p className="text-[10.5px] font-bold uppercase tracking-[0.12em] text-gray-500 mb-3">
               Your Submission
             </p>
 
             <div className="bg-gray-50 rounded-2xl border border-gray-100 p-4">
-              {/* Stars */}
+              
               <div className="flex items-center gap-0.5 mb-3">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <FiStar
@@ -100,9 +100,7 @@ export default function FeedbackSubmitted({ feedback, user }) {
                         ? { fill: "#fbbf24", color: "#fbbf24" }
                         : undefined
                     }
-                    className={
-                      star <= feedback.rating ? "" : "text-gray-300"
-                    }
+                    className={star <= feedback.rating ? "" : "text-gray-300"}
                   />
                 ))}
                 <span className="ml-2 text-[11px] font-semibold text-gray-500">
@@ -115,7 +113,7 @@ export default function FeedbackSubmitted({ feedback, user }) {
                 "{feedback.message}"
               </p>
 
-              {/* User Info */}
+              
               <div className="flex items-center gap-2.5 pt-3 border-t border-gray-200">
                 {user.photoURL ? (
                   <img
@@ -140,7 +138,7 @@ export default function FeedbackSubmitted({ feedback, user }) {
             </div>
           </div>
 
-          {/* Note */}
+        
           <div className="mt-6 flex items-start gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
             <FiLock size={12} className="text-gray-400 shrink-0 mt-0.5" />
             <p className="text-[11px] text-gray-500 leading-relaxed">
@@ -150,13 +148,14 @@ export default function FeedbackSubmitted({ feedback, user }) {
           </div>
         </div>
 
-        {/* Back Link */}
+        
         <div className="text-center mt-6">
           <Link
             to="/"
-            className="text-[12px] font-semibold text-gray-500 hover:text-black transition-colors"
+            className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-gray-500 hover:text-black transition-colors"
           >
-            ← Back to Home
+            <FiArrowLeft size={13} strokeWidth={2.4} />
+            Back to Home
           </Link>
         </div>
       </div>

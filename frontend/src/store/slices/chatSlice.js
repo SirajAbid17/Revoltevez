@@ -1,16 +1,19 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../../config/api";
 
-// ============================================
-// ASYNC THUNK
-// ============================================
 
 export const sendChatMessage = createAsyncThunk(
   "chat/send",
   async ({ message, sessionId }, { rejectWithValue }) => {
     try {
       const { data } = await api.post("/chat", { message, sessionId });
-      return data.reply;
+     
+      return {
+        reply: data.reply,
+        fallback: !!data.fallback,
+        whatsapp: data.whatsapp || null,
+        whatsappNumber: data.whatsappNumber || null,
+      };
     } catch (err) {
       return rejectWithValue(
         err.response?.data?.error ||
@@ -34,23 +37,18 @@ export const clearChatSession = createAsyncThunk(
   }
 );
 
-// ============================================
-// HELPERS
-// ============================================
 
 const makeSessionId = () =>
   `sess_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
 const buildWelcome = (userName) => ({
   role: "assistant",
-  content: `👋 Hi${
+  content: `Hi${
     userName ? ` ${userName}` : ""
   }! I'm the Revoltevez Assistant. Ask me about our electric bikes, prices, specs, or company info!`,
+  fallback: false,
 });
 
-// ============================================
-// SLICE
-// ============================================
 
 const chatSlice = createSlice({
   name: "chat",
@@ -61,7 +59,6 @@ const chatSlice = createSlice({
     error: null,
   },
   reducers: {
-    /** Initialize with welcome message (call once on mount / user change) */
     initChat: (state, action) => {
       const firstName = action.payload?.split(" ")[0];
       if (state.messages.length === 0) {
@@ -69,13 +66,11 @@ const chatSlice = createSlice({
       }
     },
 
-    /** Add user message immediately (optimistic) */
     pushUserMessage: (state, action) => {
       state.messages.push({ role: "user", content: action.payload });
       state.error = null;
     },
 
-    /** Reset everything — new session */
     resetChat: (state) => {
       state.sessionId = makeSessionId();
       state.messages = [];
@@ -89,25 +84,36 @@ const chatSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // ----- SEND MESSAGE -----
+     
       .addCase(sendChatMessage.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(sendChatMessage.fulfilled, (state, action) => {
         state.loading = false;
-        state.messages.push({ role: "assistant", content: action.payload });
+        state.messages.push({
+          role: "assistant",
+          content: action.payload.reply,
+          
+          fallback: action.payload.fallback,
+          whatsapp: action.payload.whatsapp,
+          whatsappNumber: action.payload.whatsappNumber,
+        });
       })
       .addCase(sendChatMessage.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
         state.messages.push({
           role: "assistant",
-          content: action.payload || "Something went wrong.",
+          content:
+            action.payload || "Something went wrong. Please try again.",
+          fallback: true,
+          whatsapp: "https://wa.me/923406500029",
+          whatsappNumber: "923406500029",
         });
       })
 
-      // ----- CLEAR SESSION -----
+      
       .addCase(clearChatSession.fulfilled, (state) => {
         state.messages = [];
         state.sessionId = makeSessionId();

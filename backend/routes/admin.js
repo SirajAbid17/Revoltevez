@@ -5,9 +5,6 @@ const User = require("../models/User");
 
 const router = express.Router();
 
-/**
- * POST /api/admin/promote
- */
 router.post("/promote", authenticate, requireRole("admin"), async (req, res) => {
   try {
     const { email } = req.body;
@@ -33,9 +30,7 @@ router.post("/promote", authenticate, requireRole("admin"), async (req, res) => 
   }
 });
 
-/**
- * POST /api/admin/demote
- */
+
 router.post("/demote", authenticate, requireRole("admin"), async (req, res) => {
   try {
     const { email } = req.body;
@@ -57,9 +52,7 @@ router.post("/demote", authenticate, requireRole("admin"), async (req, res) => {
   }
 });
 
-/**
- * GET /api/admin/users
- */
+
 router.get("/users", authenticate, requireRole("admin"), async (req, res) => {
   const users = await User.find().sort({ createdAt: -1 });
   res.json({ success: true, count: users.length, users });

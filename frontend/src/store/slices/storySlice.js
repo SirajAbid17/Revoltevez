@@ -1,9 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import api from "../../../config/api";     // ← ye import karo (baaki slices ki tarah)
-
-// ============================================
-// ASYNC THUNKS
-// ============================================
+import api from "../../../config/api";    
 
 export const fetchPublicStories = createAsyncThunk(
   "stories/fetchPublic",
@@ -11,7 +7,7 @@ export const fetchPublicStories = createAsyncThunk(
     try {
       const url = limit ? `/stories?limit=${limit}` : "/stories";
       const { data } = await api.get(url);
-      // Backend array return karta hai, lekin defensive check bhi rakho
+     
       return Array.isArray(data) ? data : data?.stories || [];
     } catch (e) {
       return rejectWithValue(e.response?.data?.error || "Failed to fetch");
@@ -83,9 +79,7 @@ export const deleteStory = createAsyncThunk(
   }
 );
 
-// ============================================
-// SLICE
-// ============================================
+
 
 const storySlice = createSlice({
   name: "stories",
@@ -106,7 +100,7 @@ const storySlice = createSlice({
   },
   extraReducers: (b) => {
     b
-      // Public list
+    
       .addCase(fetchPublicStories.pending, (s) => {
         s.loading = true;
         s.error = null;
@@ -121,7 +115,7 @@ const storySlice = createSlice({
         s.error = a.payload;
       })
 
-      // Single story
+     
       .addCase(fetchStoryById.pending, (s) => {
         s.currentLoading = true;
         s.current = null;
@@ -134,7 +128,7 @@ const storySlice = createSlice({
         s.currentLoading = false;
       })
 
-      // Admin all
+      
       .addCase(fetchAllStoriesAdmin.pending, (s) => {
         s.allLoading = true;
       })
@@ -146,7 +140,7 @@ const storySlice = createSlice({
         s.allLoading = false;
       })
 
-      // Create
+      
       .addCase(createStory.pending, (s) => {
         s.mutating = true;
       })
@@ -161,7 +155,7 @@ const storySlice = createSlice({
         s.mutating = false;
       })
 
-      // Update
+      
       .addCase(updateStory.pending, (s) => {
         s.mutating = true;
       })
@@ -176,7 +170,7 @@ const storySlice = createSlice({
         s.mutating = false;
       })
 
-      // Delete
+     
       .addCase(deleteStory.pending, (s) => {
         s.mutating = true;
       })

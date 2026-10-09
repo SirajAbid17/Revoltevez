@@ -30,7 +30,7 @@ export const fetchProductById = createAsyncThunk(
   }
 );
 
-// ----- ADMIN -----
+
 export const fetchAdminProducts = createAsyncThunk(
   "products/fetchAdmin",
   async (_, { rejectWithValue }) => {
@@ -91,27 +91,23 @@ export const deleteProduct = createAsyncThunk(
   }
 );
 
-// ============================================
-// SLICE
-// ============================================
 
 const initialState = {
-  // Public
+ 
   publicProducts: [],
   publicLoading: false,
   publicError: null,
 
-  // Current (single)
   currentProduct: null,
   currentLoading: false,
   currentError: null,
 
-  // Admin
+ 
   adminProducts: [],
   adminLoading: false,
   adminError: null,
 
-  // Mutations (create/update/delete)
+ 
   mutating: false,
   mutationError: null,
 };
@@ -133,7 +129,7 @@ const productsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // ----- PUBLIC -----
+     
       .addCase(fetchPublicProducts.pending, (state) => {
         state.publicLoading = true;
         state.publicError = null;
@@ -147,7 +143,7 @@ const productsSlice = createSlice({
         state.publicError = action.payload;
       })
 
-      // ----- CURRENT -----
+    
       .addCase(fetchProductById.pending, (state) => {
         state.currentLoading = true;
         state.currentError = null;
@@ -162,7 +158,7 @@ const productsSlice = createSlice({
         state.currentProduct = null;
       })
 
-      // ----- ADMIN LIST -----
+      
       .addCase(fetchAdminProducts.pending, (state) => {
         state.adminLoading = true;
         state.adminError = null;
@@ -176,7 +172,7 @@ const productsSlice = createSlice({
         state.adminError = action.payload;
       })
 
-      // ----- CREATE -----
+      
       .addCase(createProduct.pending, (state) => {
         state.mutating = true;
         state.mutationError = null;
@@ -184,7 +180,7 @@ const productsSlice = createSlice({
       .addCase(createProduct.fulfilled, (state, action) => {
         state.mutating = false;
         state.adminProducts = [action.payload, ...state.adminProducts];
-        // If published, add to public list too
+       
         if (action.payload.status === "published") {
           state.publicProducts = [action.payload, ...state.publicProducts];
         }
@@ -194,7 +190,7 @@ const productsSlice = createSlice({
         state.mutationError = action.payload;
       })
 
-      // ----- UPDATE -----
+     
       .addCase(updateProduct.pending, (state) => {
         state.mutating = true;
         state.mutationError = null;
@@ -203,12 +199,12 @@ const productsSlice = createSlice({
         state.mutating = false;
         const updated = action.payload;
 
-        // Update in admin list
+        
         state.adminProducts = state.adminProducts.map((p) =>
           p._id === updated._id ? updated : p
         );
 
-        // Update in public list (handle status change)
+       
         const existsInPublic = state.publicProducts.some(
           (p) => p._id === updated._id
         );
@@ -227,7 +223,7 @@ const productsSlice = createSlice({
           );
         }
 
-        // Update current if it's the same product
+       
         if (state.currentProduct?._id === updated._id) {
           state.currentProduct = updated;
         }
@@ -237,7 +233,7 @@ const productsSlice = createSlice({
         state.mutationError = action.payload;
       })
 
-      // ----- DELETE -----
+      
       .addCase(deleteProduct.pending, (state) => {
         state.mutating = true;
         state.mutationError = null;

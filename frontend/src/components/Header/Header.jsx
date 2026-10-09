@@ -15,7 +15,9 @@ import {
   FiLogOut,
 } from "react-icons/fi";
 import { useAuth, useClerk } from "@clerk/clerk-react";
-import { useAppSelector } from "../../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { clearUser, logoutUser } from "../../store/slices/authSlice";
+import { AUTH_MODAL_EVENT } from "../../utils/authEvents";
 import AuthModal from "../Auth/AuthModal";
 import ProfileModal from "../Auth/ProfileModal";
 import MobileDrawer from "./MobileDrawer";
@@ -32,11 +34,17 @@ export default function Header() {
   const [hoveredLink, setHoveredLink] = useState(null);
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
   const [logoError, setLogoError] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
 
+  const dispatch = useAppDispatch();
   const { user } = useAppSelector((s) => s.auth);
   const { isLoaded, isSignedIn } = useAuth();
   const { signOut } = useClerk();
-  const isLoggedIn = isLoaded && isSignedIn;
+
+  const isLoggedIn = isLoaded && isSignedIn && !signingOut;
+
+ 
+  const isAdmin = isLoggedIn && user?.role === "admin";
 
   const wasSignedInRef = useRef(null);
   const location = useLocation();
@@ -44,14 +52,25 @@ export default function Header() {
   const linkRefs = useRef({});
   const profileMenuRef = useRef(null);
 
-  /* ================= SCROLL ================= */
+  
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* ================= LOGOUT DETECTION ================= */
+ 
+  useEffect(() => {
+    const handler = (e) => {
+      const mode = e.detail?.mode || "signin";
+      setAuthMode(mode);
+      setAuthOpen(true);
+    };
+    window.addEventListener(AUTH_MODAL_EVENT, handler);
+    return () => window.removeEventListener(AUTH_MODAL_EVENT, handler);
+  }, []);
+
+
   useEffect(() => {
     if (!isLoaded) return;
     if (wasSignedInRef.current === null) {
@@ -60,21 +79,21 @@ export default function Header() {
     }
     if (wasSignedInRef.current === true && isSignedIn === false) {
       setProfileOpen(false);
-      setTimeout(() => {
-        setAuthMode("signin");
-        setAuthOpen(true);
-      }, 500);
+      setProfileMenuOpen(false);
+      setMobileMenuOpen(false);
+      setSigningOut(false);
+      dispatch(clearUser());
     }
     wasSignedInRef.current = isSignedIn;
-  }, [isSignedIn, isLoaded]);
+  }, [isSignedIn, isLoaded, dispatch]);
 
-  /* ================= CLOSE ON ROUTE CHANGE ================= */
+  
   useEffect(() => {
     setMobileMenuOpen(false);
     setProfileMenuOpen(false);
   }, [location.pathname]);
 
-  /* ================= ESC — close profile dropdown ================= */
+ 
   useEffect(() => {
     const onEsc = (e) => {
       if (e.key === "Escape") setProfileMenuOpen(false);
@@ -83,7 +102,7 @@ export default function Header() {
     return () => window.removeEventListener("keydown", onEsc);
   }, []);
 
-  /* ================= OUTSIDE CLICK — profile dropdown ================= */
+
   useEffect(() => {
     const onClick = (e) => {
       if (
@@ -114,15 +133,14 @@ export default function Header() {
     .toUpperCase();
 
   const navLinks = [
-    { to: "/products",     label: "Products",     icon: <FiPackage size={15} /> },
-    { to: "/stories",      label: "Stories",      icon: <FiBookOpen size={15} /> },
-    { to: "/about",        label: "About Us",     icon: <FiInfo size={15} /> },
-    { to: "/services",     label: "Services",     icon: <FiTool size={15} /> },
+    { to: "/products", label: "Products", icon: <FiPackage size={15} /> },
+    { to: "/stories", label: "Stories", icon: <FiBookOpen size={15} /> },
+    { to: "/about", label: "About Us", icon: <FiInfo size={15} /> },
+    { to: "/services", label: "Services", icon: <FiTool size={15} /> },
     { to: "/find-a-store", label: "Find a Store", icon: <FiMapPin size={15} /> },
-    
   ];
 
-  /* ================= SLIDING INDICATOR ================= */
+
   useEffect(() => {
     const updateIndicator = () => {
       const activeLink = linkRefs.current[location.pathname];
@@ -170,14 +188,18 @@ export default function Header() {
     }
   };
 
+  
   const handleDesktopSignOut = async () => {
     setProfileMenuOpen(false);
+    setSigningOut(true);
+    dispatch(clearUser());
+    await dispatch(logoutUser());
     await signOut({ redirectUrl: "/" });
   };
 
   return (
     <>
-      {/* ================= HEADER ================= */}
+      
       <header
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
@@ -210,7 +232,7 @@ export default function Header() {
 
         <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-12">
           <div className="h-[64px] sm:h-[72px] lg:h-[78px] flex items-center justify-between gap-4 lg:gap-8">
-            {/* ============ LOGO ============ */}
+          
             <Link to="/" className="flex items-center gap-0 shrink-0 group relative">
               <div className="relative shrink-0 flex items-center -mr-1">
                 {logoError ? (
@@ -269,7 +291,7 @@ export default function Header() {
               </span>
             </Link>
 
-            {/* ============ DESKTOP NAV (lg+) ============ */}
+          
             <nav
               ref={navRef}
               onMouseLeave={handleLinkLeave}
@@ -320,9 +342,9 @@ export default function Header() {
               })}
             </nav>
 
-            {/* ============ DESKTOP ACTIONS (lg+) ============ */}
+           
             <div className="hidden lg:flex items-center gap-2 shrink-0">
-              {user?.role === "admin" && (
+              {isAdmin && (
                 <Link
                   to="/admin/dashboard"
                   className={`
@@ -416,7 +438,6 @@ export default function Header() {
                     />
                   </button>
 
-                  {/* ============ PROFILE DROPDOWN ============ */}
                   {profileMenuOpen && (
                     <div
                       className="
@@ -492,7 +513,7 @@ export default function Header() {
               )}
             </div>
 
-            {/* ============ MOBILE MENU BUTTON (<lg) ============ */}
+            
             <button
               onClick={() => setMobileMenuOpen((v) => !v)}
               aria-label="Menu"
@@ -546,10 +567,10 @@ export default function Header() {
         </div>
       </header>
 
-      {/* Spacer */}
+     
       <div className="h-[64px] sm:h-[72px] lg:h-[78px]" />
 
-      {/* ================= MOBILE DRAWER ================= */}
+     
       <MobileDrawer
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
@@ -562,10 +583,10 @@ export default function Header() {
         onLogin={() => openAuth("signin")}
       />
 
-      {/* ================= FLOATING BUTTONS ================= */}
+    
       <FloatingButtons user={user} />
 
-      {/* ================= MODALS ================= */}
+      
       <AuthModal
         isOpen={authOpen}
         onClose={() => setAuthOpen(false)}

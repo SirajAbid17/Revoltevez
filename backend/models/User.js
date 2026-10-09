@@ -19,12 +19,10 @@ const userSchema = new mongoose.Schema(
     },
     role: { type: String, enum: ["user", "admin"], default: "user" },
 
-    // Custom fields
+   
     phone: { type: String, default: "" },
     address: { type: String, default: "" },
     city: { type: String, default: "" },
-
-    // Meta
     isActive: { type: Boolean, default: true },
     lastLoginAt: { type: Date, default: Date.now },
   },

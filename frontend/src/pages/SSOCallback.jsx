@@ -6,7 +6,7 @@ export default function SSOCallback() {
   const { isLoaded, isSignedIn } = useAuth();
   const navigate = useNavigate();
 
-  // Fallback — agar Clerk khud redirect na kare to hum 2s baad home bhej dein
+  
   useEffect(() => {
     if (!isLoaded) return;
     const t = setTimeout(() => {
@@ -24,7 +24,7 @@ export default function SSOCallback() {
         </p>
       </div>
 
-      {/* Clerk handles the OAuth callback and redirects */}
+     
       <AuthenticateWithRedirectCallback
         signInFallbackRedirectUrl="/"
         signUpFallbackRedirectUrl="/"

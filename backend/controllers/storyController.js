@@ -1,6 +1,6 @@
 const Story = require("../models/Story");
 
-/* ---------- PUBLIC ---------- */
+
 
 exports.getPublicStories = async (req, res) => {
   try {
@@ -42,7 +42,7 @@ exports.getStoryById = async (req, res) => {
   }
 };
 
-/* ---------- ADMIN ---------- */
+
 
 exports.getAllStoriesAdmin = async (req, res) => {
   try {

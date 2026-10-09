@@ -3,9 +3,9 @@ const feedbackController = require("../controllers/feedbackController");
 
 const router = express.Router();
 
-// Public
+
 router.post("/", feedbackController.submitFeedback);
 router.get("/", feedbackController.getApprovedFeedback);
-router.get("/mine", feedbackController.getMyFeedback); // ⭐ NEW
+router.get("/mine", feedbackController.getMyFeedback); 
 
 module.exports = router;

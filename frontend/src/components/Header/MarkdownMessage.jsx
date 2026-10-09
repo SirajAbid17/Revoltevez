@@ -2,11 +2,9 @@ import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-/* ============================================================
-   CUSTOM RENDERERS — brand-matched typography
-   ============================================================ */
+
 const components = {
-  /* ---------- HEADINGS ---------- */
+  
   h1: ({ children }) => (
     <h1 className="text-[14.5px] font-bold text-gray-900 mt-1 mb-1.5 leading-snug">
       {children}
@@ -23,20 +21,20 @@ const components = {
     </h3>
   ),
 
-  /* ---------- PARAGRAPHS ---------- */
+
   p: ({ children }) => (
     <p className="mb-1.5 last:mb-0 leading-[1.55] text-[12.5px]">
       {children}
     </p>
   ),
 
-  /* ---------- BOLD / ITALIC ---------- */
+  
   strong: ({ children }) => (
     <strong className="font-semibold text-gray-900">{children}</strong>
   ),
   em: ({ children }) => <em className="italic text-gray-700">{children}</em>,
 
-  /* ---------- LISTS ---------- */
+  
   ul: ({ children }) => (
     <ul className="list-none space-y-1 my-1.5 pl-0">{children}</ul>
   ),
@@ -50,7 +48,7 @@ const components = {
     </li>
   ),
 
-  /* ---------- LINKS ---------- */
+  
   a: ({ href, children }) => (
     <a
       href={href}
@@ -62,7 +60,7 @@ const components = {
     </a>
   ),
 
-  /* ---------- CODE ---------- */
+
   code: ({ inline, children, ...props }) =>
     inline ? (
       <code
@@ -85,14 +83,14 @@ const components = {
     </pre>
   ),
 
-  /* ---------- BLOCKQUOTE ---------- */
+
   blockquote: ({ children }) => (
     <blockquote className="my-2 pl-3 border-l-2 border-gray-300 text-gray-600 italic text-[12px]">
       {children}
     </blockquote>
   ),
 
-  /* ---------- TABLES ---------- */
+  
   table: ({ children }) => (
     <div className="my-2 overflow-x-auto rounded-lg border border-gray-200">
       <table className="w-full border-collapse text-[11.5px]">
@@ -114,10 +112,10 @@ const components = {
     </td>
   ),
 
-  /* ---------- DIVIDER ---------- */
+
   hr: () => <hr className="my-2 border-gray-200" />,
 
-  /* ---------- IMAGES ---------- */
+
   img: ({ src, alt }) => (
     <img
       src={src}
@@ -127,9 +125,7 @@ const components = {
   ),
 };
 
-/* ============================================================
-   MAIN COMPONENT
-   ============================================================ */
+
 export default function MarkdownMessage({ content }) {
   if (!content) return null;
 

@@ -19,7 +19,7 @@ export default function ProductsSection({
 }) {
   return (
     <div className="space-y-5">
-      {/* Header */}
+      
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 mb-3">
@@ -47,7 +47,7 @@ export default function ProductsSection({
         </button>
       </div>
 
-      {/* Content */}
+     
       {loading ? (
         <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
           <div className="w-10 h-10 border-3 border-gray-200 border-t-black rounded-full animate-spin mx-auto" />
@@ -81,11 +81,11 @@ export default function ProductsSection({
   );
 }
 
-/* ----------------- Product Card ----------------- */
+
 function ProductCard({ product, onEdit, onDelete }) {
   return (
     <article className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:border-gray-200 hover:shadow-[0_15px_50px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-500">
-      {/* Image */}
+     
       <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
         <img
           src={product.image}
@@ -120,7 +120,7 @@ function ProductCard({ product, onEdit, onDelete }) {
         </div>
       </div>
 
-      {/* Body */}
+     
       <div className="p-4">
         <div className="mb-3">
           <h3 className="text-[15px] font-bold text-[#111] tracking-tight">
@@ -150,7 +150,7 @@ function ProductCard({ product, onEdit, onDelete }) {
         </div>
 
         <div className="flex items-center gap-1.5 pt-3 border-t border-gray-100">
-          {/* ⭐ EDIT — wires to onEdit(product) */}
+         
           <button
             onClick={() => onEdit(product)}
             className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-lg bg-gray-50 hover:bg-black hover:text-white text-[11.5px] font-semibold text-gray-700 transition-all"

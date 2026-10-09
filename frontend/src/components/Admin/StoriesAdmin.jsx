@@ -35,7 +35,7 @@ export default function StoriesAdmin() {
 
   return (
     <div className="space-y-5">
-      {/* Header */}
+     
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 mb-3">
@@ -63,7 +63,7 @@ export default function StoriesAdmin() {
         </button>
       </div>
 
-      {/* Content */}
+     
       {allLoading ? (
         <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
           <div className="w-10 h-10 border-3 border-gray-200 border-t-black rounded-full animate-spin mx-auto" />

@@ -1,9 +1,5 @@
 const Product = require("../models/Product");
 
-/* ============================================================
-   HELPER — safe numeric expression for MongoDB aggregation
-   Skips "N/A", "", null cleanly using onError
-   ============================================================ */
 const SAFE_NUMERIC_PRICE = {
   $convert: {
     input: {
@@ -14,14 +10,12 @@ const SAFE_NUMERIC_PRICE = {
       },
     },
     to: "double",
-    onError: null, // ✅ "N/A" → null (no crash)
+    onError: null, 
     onNull: null,
   },
 };
 
-/* ============================================================
-   LIST ALL — for "show all products" queries
-   ============================================================ */
+
 exports.listAllProducts = async (limit = 30) => {
   const products = await Product.find({ status: "published" })
     .select("name tagline topSpeed range battery price image _id")
@@ -41,9 +35,7 @@ exports.listAllProducts = async (limit = 30) => {
   }));
 };
 
-/* ============================================================
-   SEARCH — text + optional price filter
-   ============================================================ */
+
 exports.searchProducts = async ({
   query = "",
   maxPrice = null,
@@ -53,7 +45,7 @@ exports.searchProducts = async ({
 }) => {
   const baseFilter = { status };
 
-  // Text search
+
   if (query && query.trim()) {
     const q = query.trim();
     baseFilter.$or = [
@@ -62,9 +54,9 @@ exports.searchProducts = async ({
     ];
   }
 
-  // ---------- WITH PRICE FILTER ----------
+  
   if (minPrice || maxPrice) {
-    // Pre-filter out invalid prices before aggregation
+   
     const priceFilter = {
       ...baseFilter,
       price: { $exists: true, $nin: [null, "", "N/A", "n/a"] },
@@ -114,7 +106,7 @@ exports.searchProducts = async ({
     }));
   }
 
-  // ---------- WITHOUT PRICE FILTER ----------
+  
   const products = await Product.find(baseFilter)
     .select("name tagline topSpeed range battery price image status _id")
     .sort({ createdAt: -1 })
@@ -134,9 +126,7 @@ exports.searchProducts = async ({
   }));
 };
 
-/* ============================================================
-   GET ONE BY ID
-   ============================================================ */
+
 exports.getProductById = async (productId) => {
   try {
     const p = await Product.findById(productId)
@@ -162,9 +152,7 @@ exports.getProductById = async (productId) => {
   }
 };
 
-/* ============================================================
-   CATALOG OVERVIEW — fixed with onError, no crash
-   ============================================================ */
+
 exports.getProductCategories = async () => {
   const publishedCount = await Product.countDocuments({ status: "published" });
   const draftCount = await Product.countDocuments({ status: "draft" });

@@ -16,9 +16,13 @@ const feedbackRoutes = require("./routes/feedback");
 const adminFeedbackRoutes = require("./routes/adminFeedback");
 const storyRoutes = require("./routes/storyRoutes");
 const chatRoutes = require("./routes/chatRoutes");
+const bookingRoutes = require("./routes/bookingRoutes");
+
+const groqRotator = require("./services/groqRotator");
+
 const app = express();
 
-// ================= MIDDLEWARE =================
+
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:5173",
@@ -31,7 +35,7 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
 app.use(clerkMiddleware());
 
-// ================= ROUTES =================
+
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
@@ -41,40 +45,45 @@ app.use("/api/feedback", feedbackRoutes);
 app.use("/api/admin/feedback", adminFeedbackRoutes);
 app.use("/api/stories", storyRoutes);
 app.use("/api", chatRoutes);
+app.use("/api", bookingRoutes);
 
-// Health
+
 app.get("/", (_, res) => {
   res.json({
     success: true,
     status: "OK",
-    message: "Revoltevez API is running 🚀",
+    message: "Revoltevez API is running ",
+    groqKeys: groqRotator.stats(),
     timestamp: new Date().toISOString(),
   });
 });
 
-// 404
+
 app.use((req, res) => {
   res.status(404).json({ success: false, error: "Route not found" });
 });
 
-// Error handler
+
 app.use(errorHandler);
 
-// ================= START =================
+
 const PORT = process.env.PORT || 5000;
 
 const start = async () => {
   await connectDB();
-  app.listen(PORT, () => {
-    console.log("");
-    console.log("═══════════════════════════════════════");
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
-    console.log(`🌍 Environment: ${process.env.NODE_ENV || "development"}`);
-    console.log(`🔗 CORS allowed: ${process.env.CLIENT_URL}`);
-    console.log(`🍪 Cookie name: ${process.env.COOKIE_NAME}`);
-    console.log(`☁️  Cloudinary: ${process.env.CLOUDINARY_CLOUD_NAME}`);
-    console.log("═══════════════════════════════════════");
-    console.log("");
+
+  const s = groqRotator.stats();
+
+  app.listen(PORT,() => {
+    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
+    console.log(`CORS allowed: ${process.env.CLIENT_URL}`);
+    console.log(`Cookie name: ${process.env.COOKIE_NAME}`);
+    console.log(`Cloudinary: ${process.env.CLOUDINARY_CLOUD_NAME}`);
+    console.log(
+      `Groq Keys: ${s.total} loaded (${s.availableCount} ready)`
+    );
+    
   });
 };
 
