@@ -75,7 +75,7 @@ exports.submitFeedback = async (req, res, next) => {
       status: "pending",
     });
 
-    console.log(`📝 Feedback from ${feedback.email} (avatar: ${feedback.avatar ? "yes" : "no"})`);
+    console.log(`Feedback from ${feedback.email} (avatar: ${feedback.avatar ? "yes" : "no"})`);
 
     res.status(201).json({
       success: true,

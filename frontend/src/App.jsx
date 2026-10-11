@@ -21,6 +21,7 @@ import Privacy from "./pages/Privacy";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import AdminRoute from "./components/common/AdminRoute";
 
+
 export default function App() {
   return (
     <>
@@ -68,7 +69,7 @@ export default function App() {
           }
         />
 <Route path="/privacy" element={<Privacy />} />
-      
+     
         <Route path="*" element={<NotFound />} />
       </Routes>
 

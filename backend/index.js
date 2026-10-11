@@ -52,7 +52,8 @@ app.get("/", (_, res) => {
   res.json({
     success: true,
     status: "OK",
-    message: "Revoltevez API is running ",
+    message: "Revoltevez API is running",
+    serverId: process.env.SERVER_ID || "unknown",
     groqKeys: groqRotator.stats(),
     timestamp: new Date().toISOString(),
   });
@@ -70,20 +71,24 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 
 const start = async () => {
-  await connectDB();
+ 
+  try {
+    await connectDB();
+    console.log("MongoDB connected");
+  } catch (err) {
+    console.error("MongoDB connection failed:", err.message);
+    console.log("Server will still start (load balancing test ke liye)");
+  }
 
   const s = groqRotator.stats();
 
-  app.listen(PORT,() => {
+  app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
     console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
     console.log(`CORS allowed: ${process.env.CLIENT_URL}`);
     console.log(`Cookie name: ${process.env.COOKIE_NAME}`);
     console.log(`Cloudinary: ${process.env.CLOUDINARY_CLOUD_NAME}`);
-    console.log(
-      `Groq Keys: ${s.total} loaded (${s.availableCount} ready)`
-    );
-    
+    console.log(`Groq Keys: ${s.total} loaded (${s.availableCount} ready)`);
   });
 };
 
