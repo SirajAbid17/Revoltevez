@@ -5,16 +5,9 @@ const authController = require("../controllers/authController");
 
 const router = express.Router();
 
-
 router.post("/session", clerkAuth, authController.createSession);
-
-
 router.post("/logout", authController.logout);
-
-
 router.get("/me", authenticate, authController.getSession);
-
-
 router.post("/refresh", authenticate, authController.refreshSession);
 
 module.exports = router;

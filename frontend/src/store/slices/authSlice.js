@@ -10,8 +10,11 @@ export const syncSession = createAsyncThunk(
         {},
         { headers: { Authorization: `Bearer ${clerkToken}` } }
       );
+
+      
       return data.user;
     } catch (err) {
+      console.error("syncSession failed:", err.response?.status, err.response?.data);
       return rejectWithValue(
         err.response?.data?.error || "Session sync failed"
       );
@@ -55,7 +58,6 @@ export const updateProfile = createAsyncThunk(
   }
 );
 
-
 const initialState = {
   user: null,
   isAuthenticated: false,
@@ -81,7 +83,6 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-    
       .addCase(syncSession.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -97,7 +98,6 @@ const authSlice = createSlice({
         state.error = action.payload;
       })
 
-      
       .addCase(fetchMe.pending, (state) => {
         state.loading = true;
       })
@@ -109,14 +109,14 @@ const authSlice = createSlice({
       })
       .addCase(fetchMe.rejected, (state) => {
         state.loading = false;
-        state.user = null;
-        state.isAuthenticated = false;
-        state.synced = true;
+        if (!state.user) {
+          state.user = null;
+          state.isAuthenticated = false;
+          state.synced = true;
+        }
       })
 
-    
       .addCase(logoutUser.pending, (state) => {
-       
         state.user = null;
         state.isAuthenticated = false;
         state.synced = true;
@@ -129,7 +129,6 @@ const authSlice = createSlice({
         state.error = null;
       })
 
-      
       .addCase(updateProfile.fulfilled, (state, action) => {
         state.user = action.payload;
       });
